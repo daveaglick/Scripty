@@ -1,0 +1,25 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <EvaluateScriptFiles Condition=" '$(EvaluateScriptFiles)' == '' ">true</EvaluateScriptFiles>
+
+    <CompileDependsOn Condition=" '$(EvaluateScriptFiles)' == 'true' ">
+      EvaluateScriptFiles;
+      $(CompileDependsOn);
+    </CompileDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="_ResolveScriptFiles">
+    <ItemGroup>
+      <ScriptFiles Condition=" '@(ScriptFiles)' == '' and '%(Extension)' == '.csx' " Include="@(Content);@(None)" />
+      <ScriptFiles Condition=" '@(ScriptFiles)' == '' " Include="**\*.csx" />
+    </ItemGroup>
+  </Target>
+  
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\ScriptBuildTools.MsBuild.dll" TaskName="ScriptBuildTask" />
+
+  <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" Inputs="@(ScriptFiles)">
+    <ScriptBuildTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
+      <Output TaskParameter="GeneratedFiles" ItemName="FilesGenerated" />
+    </ScriptBuildTask>
+  </Target>
+</Project>
