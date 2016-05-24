@@ -16,5 +16,6 @@
   </metadata>
   <files>
     <file src="bin\$configuration$\Scripty.MsBuild.targets" target="build" />
+    <file src="..\Scripty.Core\bin\$configuration$\*.dll" target="tools" />
   </files>
 </package>

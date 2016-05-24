@@ -102,6 +102,7 @@ Task("Create-Packages")
                 BasePath = nuspec.GetDirectory(),
                 OutputDirectory = buildResultDir,
                 Symbols = false,
+                NoPackageAnalysis = true,
                 Properties = new Dictionary<string, string>
                 {
                     { "Configuration", configuration }
