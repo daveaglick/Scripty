@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Scriptigen.MsBuild</id>
+    <version>$version$</version>
+    <title>Scriptigen.MsBuild</title>
+    <authors>Dave Glick</authors>
+    <owners>Dave Glick</owners>
+    <licenseUrl>https://github.com/daveaglick/Scriptigen/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/daveaglick/Scriptigen</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A MSBuild task that automatically runs Roslyn (csx) scripts before compilation as an alternative to T4.</description>
+    <copyright>Copyright 2016</copyright>
+    <tags>T4 MSBuild Scripting Roslyn CodeGeneration CodeGen</tags>
+    <developmentDependency>true</developmentDependency>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\Scriptigen.MsBuild.targets" target="build" />
+  </files>
+</package>

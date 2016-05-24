@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ScriptBuildTools.Common")]
+[assembly: AssemblyTitle("Scriptigen.MsBuild")]
 [assembly: AssemblyDescription("")]
-[assembly: ComVisible(false)]
-[assembly: Guid("e8fee841-5ef5-4d29-8849-e7b9a2c1b969")]
+[assembly: ComVisible(true)]
+[assembly: Guid("02aa19ac-f899-4764-a8b8-d92af080998d")]

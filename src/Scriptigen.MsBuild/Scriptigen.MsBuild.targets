@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <EvaluateScriptFiles Condition=" '$(EvaluateScriptFiles)' == '' ">true</EvaluateScriptFiles>
 
@@ -15,11 +15,11 @@
     </ItemGroup>
   </Target>
   
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\ScriptBuildTools.MsBuild.dll" TaskName="ScriptBuildTask" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scriptigen.MsBuild.dll" TaskName="ScriptigenTask" />
 
   <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" Inputs="@(ScriptFiles)">
-    <ScriptBuildTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
+    <ScriptigenTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
       <Output TaskParameter="GeneratedFiles" ItemName="FilesGenerated" />
-    </ScriptBuildTask>
+    </ScriptigenTask>
   </Target>
 </Project>

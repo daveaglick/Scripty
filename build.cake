@@ -33,7 +33,7 @@ var releaseNotes = ParseReleaseNotes("./ReleaseNotes.md");
 var version = releaseNotes.Version.ToString();
 var semVersion = version + (isLocal ? string.Empty : string.Concat("-build-", buildNumber));
 
-var msBuildBuildDir = Directory("./src/ScriptBuildTools.MsBuild/bin") + Directory(configuration);
+var msBuildBuildDir = Directory("./src/Scriptigen.MsBuild/bin") + Directory(configuration);
 var buildResultDir = Directory("./build") + Directory(semVersion);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ var buildResultDir = Directory("./build") + Directory(semVersion);
 
 Setup(() =>
 {
-    Information("Building version {0} of ScriptBuildTools.", semVersion);
+    Information("Building version {0} of Scriptigen.", semVersion);
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ Task("Restore-Packages")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        NuGetRestore("./src/ScriptBuildTools.sln");
+        NuGetRestore("./src/Scriptigen.sln");
     });
 
 Task("Patch-Assembly-Info")
@@ -68,8 +68,8 @@ Task("Patch-Assembly-Info")
     {
         var file = "./src/SolutionInfo.cs";
         CreateAssemblyInfo(file, new AssemblyInfoSettings {
-            Product = "ScriptBuildTools",
-            Copyright = "Copyright \xa9 ScriptBuildTools Contributors",
+            Product = "Scriptigen",
+            Copyright = "Copyright \xa9 Scriptigen Contributors",
             Version = version,
             FileVersion = version,
             InformationalVersion = semVersion
@@ -80,7 +80,7 @@ Task("Build")
     .IsDependentOn("Patch-Assembly-Info")
     .Does(() =>
     {
-        MSBuild("./src/ScriptBuildTools.sln", new MSBuildSettings()
+        MSBuild("./src/Scriptigen.sln", new MSBuildSettings()
             .SetConfiguration(configuration)
             .SetVerbosity(Verbosity.Minimal)
         );
@@ -105,7 +105,8 @@ Task("Create-Packages")
                 Properties = new Dictionary<string, string>
                 {
                     { "Configuration", configuration }
-                }
+                },
+                ArgumentCustomization = args => args.Append("-Tool")
             });
         }
     });
@@ -142,11 +143,11 @@ Task("Publish-Release")
             throw new InvalidOperationException("Could not resolve GitHub token.");
         }
         
-        var github = new GitHubClient(new ProductHeaderValue("ScriptBuildToolsCakeBuild"))
+        var github = new GitHubClient(new ProductHeaderValue("ScriptigenCakeBuild"))
         {
             Credentials = new Credentials(githubToken)
         };
-        var release = github.Release.Create("daveaglick", "ScriptBuildTools", new NewRelease("v" + semVersion) 
+        var release = github.Release.Create("daveaglick", "Scriptigen", new NewRelease("v" + semVersion) 
         {
             Name = semVersion,
             Body = string.Join(Environment.NewLine, releaseNotes.Notes),

@@ -5,9 +5,9 @@
 //------------------------------------------------------------------------------
 using System.Reflection;
 
-[assembly: AssemblyProduct("ScriptBuildTools")]
+[assembly: AssemblyProduct("Scriptigen")]
 [assembly: AssemblyVersion("0.0.1")]
 [assembly: AssemblyFileVersion("0.0.1")]
 [assembly: AssemblyInformationalVersion("0.0.1")]
-[assembly: AssemblyCopyright("Copyright © ScriptBuildTools Contributors")]
+[assembly: AssemblyCopyright("Copyright © Scriptigen Contributors")]
 
