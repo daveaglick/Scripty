@@ -1,6 +1,6 @@
 // The following environment variables need to be set for Publish target:
 // NUGET_API_KEY
-// SCRIPTBUILDTOOLS_GITHUB_TOKEN
+// SCRIPTY_GITHUB_TOKEN
 
 // Publishing workflow:
 // - Update ReleaseNotes.md
@@ -33,16 +33,16 @@ var releaseNotes = ParseReleaseNotes("./ReleaseNotes.md");
 var version = releaseNotes.Version.ToString();
 var semVersion = version + (isLocal ? string.Empty : string.Concat("-build-", buildNumber));
 
-var msBuildBuildDir = Directory("./src/Scriptigen.MsBuild/bin") + Directory(configuration);
+var msBuildBuildDir = Directory("./src/Scripty.MsBuild/bin") + Directory(configuration);
 var buildResultDir = Directory("./build") + Directory(semVersion);
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
 ///////////////////////////////////////////////////////////////////////////////
 
-Setup(() =>
+Setup(context =>
 {
-    Information("Building version {0} of Scriptigen.", semVersion);
+    Information("Building version {0} of Scripty.", semVersion);
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ Task("Restore-Packages")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        NuGetRestore("./src/Scriptigen.sln");
+        NuGetRestore("./src/Scripty.sln");
     });
 
 Task("Patch-Assembly-Info")
@@ -68,8 +68,8 @@ Task("Patch-Assembly-Info")
     {
         var file = "./src/SolutionInfo.cs";
         CreateAssemblyInfo(file, new AssemblyInfoSettings {
-            Product = "Scriptigen",
-            Copyright = "Copyright \xa9 Scriptigen Contributors",
+            Product = "Scripty",
+            Copyright = "Copyright \xa9 Scripty Contributors",
             Version = version,
             FileVersion = version,
             InformationalVersion = semVersion
@@ -80,7 +80,7 @@ Task("Build")
     .IsDependentOn("Patch-Assembly-Info")
     .Does(() =>
     {
-        MSBuild("./src/Scriptigen.sln", new MSBuildSettings()
+        MSBuild("./src/Scripty.sln", new MSBuildSettings()
             .SetConfiguration(configuration)
             .SetVerbosity(Verbosity.Minimal)
         );
@@ -143,11 +143,11 @@ Task("Publish-Release")
             throw new InvalidOperationException("Could not resolve GitHub token.");
         }
         
-        var github = new GitHubClient(new ProductHeaderValue("ScriptigenCakeBuild"))
+        var github = new GitHubClient(new ProductHeaderValue("ScriptyCakeBuild"))
         {
             Credentials = new Credentials(githubToken)
         };
-        var release = github.Release.Create("daveaglick", "Scriptigen", new NewRelease("v" + semVersion) 
+        var release = github.Release.Create("daveaglick", "Scripty", new NewRelease("v" + semVersion) 
         {
             Name = semVersion,
             Body = string.Join(Environment.NewLine, releaseNotes.Notes),

@@ -15,11 +15,11 @@
     </ItemGroup>
   </Target>
   
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scriptigen.MsBuild.dll" TaskName="ScriptigenTask" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scripty.MsBuild.dll" TaskName="ScriptyTask" />
 
   <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" Inputs="@(ScriptFiles)">
-    <ScriptigenTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
+    <ScriptyTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
       <Output TaskParameter="GeneratedFiles" ItemName="FilesGenerated" />
-    </ScriptigenTask>
+    </ScriptyTask>
   </Target>
 </Project>

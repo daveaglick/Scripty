@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptigen.MsBuild", "Scriptigen.MsBuild\Scriptigen.MsBuild.csproj", "{02AA19AC-F899-4764-A8B8-D92AF080998D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.MsBuild", "Scripty.MsBuild\Scripty.MsBuild.csproj", "{02AA19AC-F899-4764-A8B8-D92AF080998D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scriptigen.Common", "Scriptigen.Common\Scriptigen.Common.csproj", "{E8FEE841-5EF5-4D29-8849-E7B9A2C1B969}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.Common", "Scripty.Common\Scripty.Common.csproj", "{E8FEE841-5EF5-4D29-8849-E7B9A2C1B969}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

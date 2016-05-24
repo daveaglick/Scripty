@@ -5,9 +5,9 @@ using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace Scriptigen.MsBuild
+namespace Scripty.MsBuild
 {
-    public class ScriptigenTask : Task
+    public class ScriptyTask : Task
     {
         [Required]
         public string ProjectRoot { get; set; }
