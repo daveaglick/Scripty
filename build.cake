@@ -110,6 +110,25 @@ Task("Create-Packages")
             });
         }
     });
+    
+Task("Test-MsBuild")
+    .IsDependentOn("Create-Packages")
+    .Does(() =>
+    {
+        DeleteDirectory("./src/Scripty.MsBuild.Test/packages", true);
+        NuGetRestore("./src/Scripty.MsBuild.Test/Scripty.MsBuild.Test.sln");
+        NuGetInstall("Scripty.MsBuild", new NuGetInstallSettings
+        {
+            NoCache = true,
+            Source = new [] { "file:///" + MakeAbsolute(buildResultDir).FullPath },
+            ExcludeVersion = true,
+            OutputDirectory = "./src/Scripty.MsBuild.Test/packages"
+        });      
+        MSBuild("./src/Scripty.MsBuild.Test/Scripty.MsBuild.Test.sln", new MSBuildSettings()
+            .SetConfiguration("Debug")
+            .SetVerbosity(Verbosity.Minimal)
+        );  
+    });
         
 Task("Publish-Packages")
     .IsDependentOn("Create-Packages")
@@ -169,9 +188,12 @@ Task("Update-AppVeyor-Build-Number")
     
 Task("Package")
     .IsDependentOn("Create-Packages");
+    
+Task("Test")
+    .IsDependentOn("Test-MsBuild");
 
 Task("Default")
-    .IsDependentOn("Package");    
+    .IsDependentOn("Test");
 
 Task("Publish")
     .IsDependentOn("Publish-Packages")

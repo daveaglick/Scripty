@@ -17,9 +17,12 @@
   
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scripty.MsBuild.dll" TaskName="ScriptyTask" />
 
-  <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" Inputs="@(ScriptFiles)">
+  <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" BeforeTargets="Build">
     <ScriptyTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
-      <Output TaskParameter="GeneratedFiles" ItemName="FilesGenerated" />
+      <Output TaskParameter="GeneratedFiles" ItemName="GeneratedFiles" />
     </ScriptyTask>
+    <ItemGroup>
+      <Compile Include="@(GeneratedFiles)" />
+    </ItemGroup>
   </Target>
 </Project>

@@ -14,9 +14,18 @@ namespace Scripty.MsBuild
 
         public ITaskItem[] ScriptFiles { get; set; }
 
+        [Output]
+        public ITaskItem[] GeneratedFiles
+        {
+            get
+            {
+                return Array.Empty<ITaskItem>();
+            }
+        }
+
         public override bool Execute()
         {
-            Log.LogMessage($"Script files: {String.Join(",", ScriptFiles.Select(x => x.ItemSpec))}");
+            Log.LogError($"Script files: {String.Join(",", ScriptFiles.Select(x => x.ItemSpec))}");
             return true;
         }
     }
