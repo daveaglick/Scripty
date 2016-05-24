@@ -1,4 +1,4 @@
 ﻿using System;
 
-Output.WriteLine($"// {DateTime.Now}");
-Output["Other.txt"].WriteLine(DateTime.Now);
+Output.WriteLine($"clasds Foo {{ int X => 2; }}");
+//Output["foo\\bar.txt"].WriteLine(DateTime.Now);

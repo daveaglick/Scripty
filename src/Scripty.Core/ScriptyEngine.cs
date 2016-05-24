@@ -12,20 +12,18 @@ namespace Scripty.Core
         {
             ScriptOptions options = ScriptOptions.Default
                 .WithFilePath(source.FilePath);
-            ScriptGlobals globals = new ScriptGlobals(source.FilePath);
-            try
+            using (ScriptGlobals globals = new ScriptGlobals(source.FilePath))
             {
-                await CSharpScript.EvaluateAsync(source.Code, options, globals);
+                try
+                {
+                    await CSharpScript.EvaluateAsync(source.Code, options, globals);
+                }
+                catch (CompilationErrorException compilationError)
+                {
+                    return new ScriptResult(globals.Output.FilePaths, compilationError.Diagnostics.Select(x => x.ToString()).ToList());
+                }
+                return new ScriptResult(globals.Output.FilePaths);
             }
-            catch (CompilationErrorException compilationError)
-            {
-                return new ScriptResult(compilationError.Diagnostics.Select(x => x.ToString()).ToList());
-            }
-            finally
-            {
-                globals.Dispose();
-            }
-            return new ScriptResult();
         }
     }
 }

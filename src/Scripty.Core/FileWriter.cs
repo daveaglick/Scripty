@@ -55,16 +55,20 @@ namespace Scripty.Core
                 {
                     throw new ArgumentException("Value cannot be null or empty", nameof(filePath));
                 }
-
+                
+                filePath = Path.Combine(Path.GetDirectoryName(_filePath), filePath);
                 StreamWriter writer;
                 if (!_outputs.TryGetValue(filePath, out writer))
                 {
-                    writer = new StreamWriter(Path.Combine(Path.GetDirectoryName(_filePath), filePath));
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    writer = new StreamWriter(filePath);
                     _outputs.Add(filePath, writer);
                 }
                 return writer;
             }
         }
+
+        internal ICollection<string> FilePaths => _outputs.Keys;
 
         public override void Close() => this[_filePath].Close();
 

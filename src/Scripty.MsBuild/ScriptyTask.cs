@@ -6,25 +6,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using Scripty.Core;
+using Task = System.Threading.Tasks.Task;
 
 namespace Scripty.MsBuild
 {
     public class ScriptyTask : Microsoft.Build.Utilities.Task
     {
+        private readonly List<ITaskItem> _generatedFiles = new List<ITaskItem>();
+
         [Required]
         public string ProjectRoot { get; set; }
 
         public ITaskItem[] ScriptFiles { get; set; }
 
         [Output]
-        public ITaskItem[] GeneratedFiles
-        {
-            get
-            {
-                return Array.Empty<ITaskItem>();
-            }
-        }
+        public ITaskItem[] GeneratedFiles => _generatedFiles.ToArray();
 
         public override bool Execute()
         {
@@ -62,13 +60,23 @@ namespace Scripty.MsBuild
                 }
             }
 
-            // Check for any errors
+            // Iterate over the completed tasks
             foreach (Task<ScriptResult> task in tasks.Where(x => x.Status == TaskStatus.RanToCompletion))
             {
+                // Check for any errors
                 foreach (string error in task.Result.Errors)
                 {
                     Log.LogError(error);
                 }
+
+                // Add the generated files
+                _generatedFiles.AddRange(task.Result.OutputFiles.Select(x =>
+                {
+                    TaskItem taskItem = new TaskItem(x);
+                    taskItem.SetMetadata("AutoGen", "true");
+                    taskItem.SetMetadata("DependentUpon", "fileName");
+                    return taskItem;
+                }));
             }
 
             return true;
