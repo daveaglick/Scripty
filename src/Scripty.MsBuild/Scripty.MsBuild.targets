@@ -1,11 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <EvaluateScriptFiles Condition=" '$(EvaluateScriptFiles)' == '' ">true</EvaluateScriptFiles>
-
-    <CompileDependsOn Condition=" '$(EvaluateScriptFiles)' == 'true' ">
-      EvaluateScriptFiles;
-      $(CompileDependsOn);
-    </CompileDependsOn>
   </PropertyGroup>
   
   <Target Name="_ResolveScriptFiles">
@@ -17,12 +12,12 @@
   
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scripty.MsBuild.dll" TaskName="ScriptyTask" />
 
-  <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" BeforeTargets="Build">
+  <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" BeforeTargets="BeforeCompile">
     <ScriptyTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
-      <Output TaskParameter="GeneratedFiles" ItemName="GeneratedFiles" />
+      <Output TaskParameter="CompileFiles" ItemName="CompileFiles" />
     </ScriptyTask>
     <ItemGroup>
-      <Compile Include="@(GeneratedFiles)" />
+      <Compile Include="@(CompileFiles)" />
     </ItemGroup>
   </Target>
 </Project>

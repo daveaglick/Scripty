@@ -5,19 +5,18 @@ namespace Scripty.Core
 {
     public class ScriptResult
     {
-        public ICollection<string> OutputFiles { get; }
+        public ICollection<IOutputFileInfo> OutputFiles { get; }
         public ICollection<string> Errors { get; }
 
-        public ScriptResult(ICollection<string> outputFiles)
+        internal ScriptResult(ICollection<IOutputFileInfo> outputFiles)
             : this(outputFiles, Array.Empty<string>())
         {
         }
 
-        internal ScriptResult(ICollection<string> outputFiles, ICollection<string> errors)
+        internal ScriptResult(ICollection<IOutputFileInfo> outputFiles, ICollection<string> errors)
         {
             OutputFiles = outputFiles;
             Errors = errors;
         }
-
     }
 }

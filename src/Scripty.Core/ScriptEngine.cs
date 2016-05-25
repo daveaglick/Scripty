@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Scripting;
 
 namespace Scripty.Core
 {
-    public class ScriptyEngine
+    public class ScriptEngine
     {
         public async Task<ScriptResult> Evaluate(ScriptSource source)
         {
@@ -20,9 +20,9 @@ namespace Scripty.Core
                 }
                 catch (CompilationErrorException compilationError)
                 {
-                    return new ScriptResult(globals.Output.FilePaths, compilationError.Diagnostics.Select(x => x.ToString()).ToList());
+                    return new ScriptResult(globals.Output.OutputFiles, compilationError.Diagnostics.Select(x => x.ToString()).ToList());
                 }
-                return new ScriptResult(globals.Output.FilePaths);
+                return new ScriptResult(globals.Output.OutputFiles);
             }
         }
     }

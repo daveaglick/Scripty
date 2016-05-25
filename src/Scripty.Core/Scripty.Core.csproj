@@ -80,11 +80,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileWriter.cs" />
+    <Compile Include="IOutputFileInfo.cs" />
+    <Compile Include="OutputFileCollection.cs" />
+    <Compile Include="OutputFile.cs" />
     <Compile Include="ScriptGlobals.cs" />
     <Compile Include="ScriptResult.cs" />
     <Compile Include="ScriptSource.cs" />
-    <Compile Include="ScriptyEngine.cs" />
+    <Compile Include="ScriptEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

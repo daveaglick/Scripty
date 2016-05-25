@@ -1,21 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Scripty.Core
 {
-    public class FileWriter : TextWriter
+    public class OutputFileCollection : TextWriter
     {
         private readonly string _filePath;
-        private readonly Dictionary<string, StreamWriter> _outputs
-            = new Dictionary<string, StreamWriter>();
+        private readonly Dictionary<string, OutputFile> _outputFiles
+            = new Dictionary<string, OutputFile>();
 
         private bool _disposed;
 
-        internal FileWriter(string filePath)
+        internal OutputFileCollection(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
             { 
@@ -33,13 +34,13 @@ namespace Scripty.Core
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(nameof(FileWriter));
+                throw new ObjectDisposedException(nameof(OutputFileCollection));
             }
             _disposed = true;
 
-            foreach (StreamWriter writer in _outputs.Values)
+            foreach (OutputFile outputFile in _outputFiles.Values)
             {
-                writer.Dispose();
+                outputFile.Dispose();
             }
         }
 
@@ -49,7 +50,7 @@ namespace Scripty.Core
             {
                 if (_disposed)
                 {
-                    throw new ObjectDisposedException(nameof(FileWriter));
+                    throw new ObjectDisposedException(nameof(OutputFileCollection));
                 }
                 if (string.IsNullOrEmpty(filePath))
                 {
@@ -57,18 +58,18 @@ namespace Scripty.Core
                 }
                 
                 filePath = Path.Combine(Path.GetDirectoryName(_filePath), filePath);
-                StreamWriter writer;
-                if (!_outputs.TryGetValue(filePath, out writer))
+                OutputFile outputFile;
+                if (!_outputFiles.TryGetValue(filePath, out outputFile))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                    writer = new StreamWriter(filePath);
-                    _outputs.Add(filePath, writer);
+                    outputFile = new OutputFile(filePath);
+                    _outputFiles.Add(filePath, outputFile);
                 }
-                return writer;
+                return outputFile;
             }
         }
 
-        internal ICollection<string> FilePaths => _outputs.Keys;
+        internal ICollection<IOutputFileInfo> OutputFiles => _outputFiles.Values.Cast<IOutputFileInfo>().ToList();
 
         public override void Close() => this[_filePath].Close();
 

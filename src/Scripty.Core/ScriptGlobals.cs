@@ -5,7 +5,7 @@ namespace Scripty.Core
 {
     public class ScriptGlobals : IDisposable
     {
-        public FileWriter Output { get; }
+        public OutputFileCollection Output { get; }
 
         internal ScriptGlobals(string filePath)
         {
@@ -14,7 +14,7 @@ namespace Scripty.Core
                 throw new ArgumentException("Value cannot be null or empty", nameof(filePath));
             }
 
-            Output = new FileWriter(Path.ChangeExtension(filePath, ".cs"));
+            Output = new OutputFileCollection(Path.ChangeExtension(filePath, ".cs"));
         }
 
         public void Dispose()

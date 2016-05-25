@@ -14,7 +14,7 @@ namespace Scripty.MsBuild
 {
     public class ScriptyTask : Microsoft.Build.Utilities.Task
     {
-        private readonly List<ITaskItem> _generatedFiles = new List<ITaskItem>();
+        private readonly List<ITaskItem> _compileFiles = new List<ITaskItem>();
 
         [Required]
         public string ProjectRoot { get; set; }
@@ -22,7 +22,7 @@ namespace Scripty.MsBuild
         public ITaskItem[] ScriptFiles { get; set; }
 
         [Output]
-        public ITaskItem[] GeneratedFiles => _generatedFiles.ToArray();
+        public ITaskItem[] CompileFiles => _compileFiles.ToArray();
 
         public override bool Execute()
         {
@@ -32,7 +32,7 @@ namespace Scripty.MsBuild
             }
 
             // Setup all the script sources and evaluation tasks
-            ScriptyEngine scripty = new ScriptyEngine();
+            ScriptEngine engine = new ScriptEngine();
             string projectRoot = String.IsNullOrEmpty(ProjectRoot) ? Directory.GetCurrentDirectory() : ProjectRoot;
             ConcurrentBag<Task<ScriptResult>> tasks = new ConcurrentBag<Task<ScriptResult>>();
             Parallel.ForEach(ScriptFiles
@@ -43,7 +43,7 @@ namespace Scripty.MsBuild
                 {
                     if (File.Exists(x))
                     {
-                        tasks.Add(scripty.Evaluate(new ScriptSource(x, File.ReadAllText(x))));
+                        tasks.Add(engine.Evaluate(new ScriptSource(x, File.ReadAllText(x))));
                     }
                 });
 
@@ -69,14 +69,15 @@ namespace Scripty.MsBuild
                     Log.LogError(error);
                 }
 
-                // Add the generated files
-                _generatedFiles.AddRange(task.Result.OutputFiles.Select(x =>
-                {
-                    TaskItem taskItem = new TaskItem(x);
-                    taskItem.SetMetadata("AutoGen", "true");
-                    taskItem.SetMetadata("DependentUpon", "fileName");
-                    return taskItem;
-                }));
+                // Add the compile files
+                _compileFiles.AddRange(task.Result.OutputFiles
+                    .Where(x => x.Compile)
+                    .Select(x =>
+                    {
+                        TaskItem taskItem = new TaskItem(x.FilePath);
+                        taskItem.SetMetadata("AutoGen", "true");
+                        return taskItem;
+                    }));
             }
 
             return true;
