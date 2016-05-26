@@ -13,7 +13,7 @@ namespace Scripty.Core
         {
             _streamWriter = new StreamWriter(filePath);
             FilePath = filePath;
-            Compile = true;
+            Compile = Path.GetExtension(filePath) == ".cs";
         }
 
         protected override void Dispose(bool disposing)

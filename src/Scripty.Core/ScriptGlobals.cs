@@ -14,7 +14,7 @@ namespace Scripty.Core
                 throw new ArgumentException("Value cannot be null or empty", nameof(filePath));
             }
 
-            Output = new OutputFileCollection(Path.ChangeExtension(filePath, ".cs"));
+            Output = new OutputFileCollection(filePath);
         }
 
         public void Dispose()
