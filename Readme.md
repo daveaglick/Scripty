@@ -2,6 +2,10 @@
 
 Tools to let you use Roslyn-powered C# scripts for code generation. You can think of it as a scripted alternative to T4 templates.
 
+## Quick Start
+
+The easiest way to get up and running is to install the `Scripty.MsBuild` NuGet package into an existing project (it's currently pre-release so you'll have to specify to allow pre-release packages). Then just create a script file with a `.csx` extension, add it to your project, and watch the magic happen on your next build.
+
 ## Scripts
 
 Scripty scripts are just [standard Roslyn C# scripts](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples) with some special global properties to make them suitable for powering code generation. All the standard C# scripting conventions still apply such as using the `#r` preprocessor directive to load assemblies and the  `#load` directive to load external script files. They are also generally given `.csx` extensions just like normal C# scripts. This makes it easy to bootstrap evaluating them outside Scripty if you need to, providing whichever Scripty globals you use in the script yourself.
