@@ -17,7 +17,7 @@ namespace Scripty.MsBuild
         private readonly List<ITaskItem> _compileFiles = new List<ITaskItem>();
 
         [Required]
-        public string ProjectRoot { get; set; }
+        public string ProjectFilePath { get; set; }
 
         public ITaskItem[] ScriptFiles { get; set; }
 
@@ -32,8 +32,7 @@ namespace Scripty.MsBuild
             }
 
             // Setup all the script sources and evaluation tasks
-            ScriptEngine engine = new ScriptEngine();
-            string projectRoot = String.IsNullOrEmpty(ProjectRoot) ? Directory.GetCurrentDirectory() : ProjectRoot;
+            ScriptEngine engine = new ScriptEngine(ProjectFilePath);
             ConcurrentBag<Task<ScriptResult>> tasks = new ConcurrentBag<Task<ScriptResult>>();
             Parallel.ForEach(ScriptFiles
                 .Select(x => x.GetMetadata("FullPath"))

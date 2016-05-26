@@ -13,7 +13,7 @@
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scripty.MsBuild.dll" TaskName="ScriptyTask" />
 
   <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" BeforeTargets="BeforeCompile">
-    <ScriptyTask ProjectRoot="$(MsBuildProjectDirectory)" ScriptFiles="@(ScriptFiles)">
+    <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" ScriptFiles="@(ScriptFiles)">
       <Output TaskParameter="CompileFiles" ItemName="CompileFiles" />
     </ScriptyTask>
     <ItemGroup>

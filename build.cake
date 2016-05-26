@@ -127,7 +127,8 @@ Task("Test-MsBuild")
         });      
         MSBuild("./src/Scripty.MsBuild.Test/Scripty.MsBuild.Test.sln", new MSBuildSettings()
             .SetConfiguration("Debug")
-            .SetVerbosity(Verbosity.Minimal)
+            //.SetVerbosity(Verbosity.Minimal)
+            .SetVerbosity(Verbosity.Diagnostic)
         );  
     });
         
