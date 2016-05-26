@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Scripty.Core;
-using Task = System.Threading.Tasks.Task;
 
 namespace Scripty.MsBuild
 {
@@ -30,54 +30,73 @@ namespace Scripty.MsBuild
             {
                 return true;
             }
+            if (string.IsNullOrEmpty(ProjectFilePath))
+            {
+                Log.LogError("A project file is required");
+                return false;
+            }
+            if (!Path.IsPathRooted(ProjectFilePath))
+            {
+                Log.LogError("The project file path must be absolute");
+                return false;
+            }
 
-            // Setup all the script sources and evaluation tasks
-            ScriptEngine engine = new ScriptEngine(ProjectFilePath);
-            ConcurrentBag<Task<ScriptResult>> tasks = new ConcurrentBag<Task<ScriptResult>>();
-            Parallel.ForEach(ScriptFiles
+            // Get the script files and construct the arguments to pass to the CLI
+            string scriptFiles = string.Join(" ", ScriptFiles
                 .Select(x => x.GetMetadata("FullPath"))
                 .Where(x => !string.IsNullOrEmpty(x))
-                .Distinct(), 
-                x =>
-                {
-                    if (File.Exists(x))
-                    {
-                        tasks.Add(engine.Evaluate(new ScriptSource(x, File.ReadAllText(x))));
-                    }
-                });
+                .Distinct()
+                .Select(x => "\"" + x + "\""));
 
-            // Evaluate all the scripts
-            try
+            // Kick off the evaluation process, which must be done in a seperate process space
+            // otherwise MSBuild complains when we construct the Roslyn workspace project since
+            // it uses MSBuild to figure out what the project contains and MSBuild only supports
+            // one build per process
+            Log.LogMessage("Starting out-of-process script evaluation...");
+            string arguments = $"\"{ProjectFilePath}\" {scriptFiles}";
+            Log.LogMessage("Arguments: " + arguments);
+            List<string> outputData = new List<string>();
+            List<string> errorData = new List<string>();
+            Process process = new Process();
+            process.StartInfo.FileName = Path.Combine(Path.GetDirectoryName(typeof(ScriptyTask).Assembly.Location), "Scripty.exe");
+            process.StartInfo.Arguments = arguments;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.OutputDataReceived += (s, e) => outputData.Add(e.Data);
+            process.ErrorDataReceived += (s, e) => errorData.Add(e.Data);
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+            if (process.ExitCode == 0)
             {
-                Task.WaitAll(tasks.ToArray());
+                Log.LogMessage("Finished script evaluation");
             }
-            catch (AggregateException aggregateException)
+            else
             {
-                foreach (Exception ex in aggregateException.InnerExceptions)
-                {
-                    Log.LogErrorFromException(ex);
-                }
+                Log.LogError("Got non-zero exit code from script evaluation: " + process.ExitCode);
             }
 
-            // Iterate over the completed tasks
-            foreach (Task<ScriptResult> task in tasks.Where(x => x.Status == TaskStatus.RanToCompletion))
+            // Report any errors
+            foreach (string error in errorData.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
-                // Check for any errors
-                foreach (string error in task.Result.Errors)
-                {
-                    Log.LogError(error);
-                }
-
-                // Add the compile files
-                _compileFiles.AddRange(task.Result.OutputFiles
-                    .Where(x => x.Compile)
-                    .Select(x =>
-                    {
-                        TaskItem taskItem = new TaskItem(x.FilePath);
-                        taskItem.SetMetadata("AutoGen", "true");
-                        return taskItem;
-                    }));
+                Log.LogError(error);
             }
+
+            // Add the compile files
+            List<string> compileFiles = outputData
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+            Log.LogMessage("Compile file count: " + compileFiles.Count);
+            _compileFiles.AddRange(compileFiles
+                .Select(x =>
+                {
+                    TaskItem taskItem = new TaskItem(x);
+                    taskItem.SetMetadata("AutoGen", "true");
+                    return taskItem;
+                }));
 
             return true;
         }

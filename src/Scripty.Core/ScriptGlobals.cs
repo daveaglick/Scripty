@@ -8,14 +8,15 @@ namespace Scripty.Core
     {
         private readonly Func<Project> _loadProject;
 
-        public OutputFileCollection Output { get; }
-        public string ProjectFilePath { get; }
-
         internal ScriptGlobals(string scriptFilePath, string projectFilePath, Func<Project> loadProject)
         {
             if (string.IsNullOrEmpty(scriptFilePath))
             {
                 throw new ArgumentException("Value cannot be null or empty", nameof(scriptFilePath));
+            }
+            if (!Path.IsPathRooted(scriptFilePath))
+            {
+                throw new ArgumentException("The script file path must be absolute");
             }
             if (loadProject == null)
             {
@@ -23,6 +24,7 @@ namespace Scripty.Core
             }
 
             Output = new OutputFileCollection(scriptFilePath);
+            ScriptFilePath = scriptFilePath;
             ProjectFilePath = projectFilePath;
             _loadProject = loadProject;
         }
@@ -31,6 +33,12 @@ namespace Scripty.Core
         {
             Output.Dispose();
         }
+
+        public string ScriptFilePath { get; }
+
+        public string ProjectFilePath { get; }
+
+        public OutputFileCollection Output { get; }
 
         public Project Project => _loadProject();
     }

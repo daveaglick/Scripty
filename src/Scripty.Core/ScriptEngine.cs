@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -21,6 +22,15 @@ namespace Scripty.Core
 
         public ScriptEngine(string projectFilePath)
         {
+            if (string.IsNullOrEmpty(projectFilePath))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(projectFilePath));
+            }
+            if (!Path.IsPathRooted(projectFilePath))
+            {
+                throw new ArgumentException("Project path must be absolute", nameof(projectFilePath));
+            }
+
             _projectFilePath = projectFilePath;
 
             // Uncomment to pause execution while waiting for a debugger to attach

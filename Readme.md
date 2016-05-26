@@ -17,13 +17,24 @@ The following namespaces are imported to every script by default:
 
 The following global properties are available when evaluating your script with Scripty:
 
+* `ScriptFilePath`
+
+The full path to the currently evaluating script.
+
 * `ProjectFilePath`
 
-Contains the full path to the current project file.
+The full path to the current project file.
 
 * `Project`
 
-A Roslyn `Microsoft.CodeAnalysis.Project` that represents the current project.
+A Roslyn `Microsoft.CodeAnalysis.Project` that represents the current project. You can use this to access the files in the project as well as other information, including getting the Roslyn compilation for the project. For example, this script will output comments with the file name of each file in the project:
+
+```
+foreach(Document document in Project.Documents)
+{
+    Output.WriteLine($"// {document.FilePath}");
+}
+```
 
 * `Output`
 
@@ -91,13 +102,22 @@ Files that get generated using the MsBuild task are included during compilation 
 
 This library provides a single file generator (otherwise known as a custom tool) in Visual Studio that can be used to evaluate Scripty scripts whenever the underlying script file changes. Unlike `Scripty.MsBuild`, generated output from the scripts will get automatically included in the project. This library and `Scripty.MsBuild` can be used together to provide script evaluation on changes *and* on build.
 
+### Scripty
+
+A console application that can evaluate Scripty scripts. This can be used to integrate Scripty into alternate build systems. It's also used by Scripty.MsBuild to evaluate scripts outside the process space of the currently running build.
+
+```
+>Scripty.exe --help
+usage:  <ProjectFilePath> <ScriptFilePaths>...
+
+    <ProjectFilePath>       The full path of the project file.
+    <ScriptFilePaths>...    The path(s) of script files to evaluate (can
+                            be absolute or relative to the project).
+```
+
 ### Scripty.Core
 
-This library is the foundation of Scripty and can be used if you want bespoke Scripty evaluation. It lets you run the Scripty engine on C# scripts, supplying information that Scripty needs to set up the special global properties like the current project path.
-
-### Scripty.Console (Planned)
-
-A console application that can evaluate Scripty scripts, supplying information on the command line that Scripty needs to set up the special global properties like the current project path. This lets you evaluate Scripty scripts inside alternate build systems.
+This library is the foundation of Scripty and can be used if you want to embed Scripty evaluation. It lets you run the Scripty engine directly, supplying any data needed to set up the special global properties like the current project path.
 
 ### Cake.Scripty (Planned)
 
