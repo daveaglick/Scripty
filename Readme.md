@@ -82,7 +82,7 @@ Output["other.cs"].Compile = true;
 
 ## Libraries
 
-Scripty support is provided via a variety of libraries (and corresponding NuGet packages) for different scenarios.
+Scripty support is provided via a variety of libraries (and corresponding NuGet packages) for different scenarios. Note that because Scripty is still in beta, **you'll need to search pre-release packages** to find them.
 
 ### Scripty.MsBuild
 

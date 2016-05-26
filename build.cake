@@ -31,10 +31,14 @@ var buildNumber = AppVeyor.Environment.Build.Number;
 var releaseNotes = ParseReleaseNotes("./ReleaseNotes.md");
 
 var version = releaseNotes.Version.ToString();
-var semVersion = version + (isLocal ? string.Empty : string.Concat("-build-", buildNumber));
+var semVersion = version + (isLocal ? "-beta" : string.Concat("-build-", buildNumber));
 
-var msBuildBuildDir = Directory("./src/Scripty.MsBuild/bin") + Directory(configuration);
+var buildDir = Directory("./src/Scripty/bin") + Directory(configuration);
 var buildResultDir = Directory("./build") + Directory(semVersion);
+var nugetRoot = buildResultDir + Directory("nuget");
+var binDir = buildResultDir + Directory("bin");
+
+var zipFile = "Scripty-v" + semVersion + ".zip";
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -52,7 +56,7 @@ Setup(context =>
 Task("Clean")
     .Does(() =>
     {
-        CleanDirectories(new DirectoryPath[] { msBuildBuildDir, buildResultDir });
+        CleanDirectories(new DirectoryPath[] { buildDir, buildResultDir, binDir, nugetRoot });
     });
 
 Task("Restore-Packages")
@@ -86,43 +90,100 @@ Task("Build")
         );
     });
 
-Task("Create-Packages")
+Task("Copy-Files")
+    .IsDependentOn("Build")
+    .Does(() =>
+    {
+        CopyDirectory(buildDir, binDir);
+        CopyFiles(new FilePath[] { "LICENSE", "README.md", "ReleaseNotes.md" }, binDir);
+    });
+
+Task("Zip-Files")
+    .IsDependentOn("Copy-Files")
+    .Does(() =>
+    {
+        var zipPath = buildResultDir + File(zipFile);
+        var files = GetFiles(binDir.Path.FullPath + "/**/*");
+        Zip(binDir, zipPath, files);
+    });
+
+Task("Create-Library-Packages")
     .IsDependentOn("Build")
     .Does(() =>
     {        
         // Get the set of nuspecs to package
-        List<FilePath> nuspecs = new List<FilePath>(GetFiles("./src/**/*.nuspec"));
+        List<FilePath> nuspecs = new List<FilePath>(GetFiles("./src/Scripty.*/*.nuspec"));
         
         // Package all nuspecs
         foreach (var nuspec in nuspecs)
         {
-            NuGetPack(nuspec.ChangeExtension(".csproj"), new NuGetPackSettings
+            // Common settings
+            var nuGetPackSettings = new NuGetPackSettings
             {
                 Version = semVersion,
                 BasePath = nuspec.GetDirectory(),
-                OutputDirectory = buildResultDir,
+                OutputDirectory = nugetRoot,
                 Symbols = false,
                 NoPackageAnalysis = true,
                 Properties = new Dictionary<string, string>
                 {
                     { "Configuration", configuration }
-                },
-                ArgumentCustomization = args => args.Append("-Tool")
-            });
+                }
+            };
+            
+            // Add the tools property to the MSBuild package
+            if(nuspec.GetFilenameWithoutExtension().FullPath == "Scripty.MsBuild")
+            {
+                nuGetPackSettings.ArgumentCustomization = args => args.Append("-Tool");
+            }
+                
+            // Do the packing
+            NuGetPack(nuspec.ChangeExtension(".csproj"), nuGetPackSettings);
         }
+    });
+
+Task("Create-Tools-Package")
+    .IsDependentOn("Build")
+    .Does(() =>
+    {        
+        var nuspec = GetFiles("./src/Scripty/*.nuspec").FirstOrDefault();
+        if (nuspec == null)
+        {            
+            throw new InvalidOperationException("Could not find tools nuspec.");
+        }
+        var pattern = string.Format("bin\\{0}\\**\\*", configuration);  // This is needed to get around a Mono scripting issue (see #246, #248, #249)
+        NuGetPack(nuspec, new NuGetPackSettings
+        {
+            Version = semVersion,
+            BasePath = nuspec.GetDirectory(),
+            OutputDirectory = nugetRoot,
+            Symbols = false,
+            Files = new [] 
+            { 
+                new NuSpecContent 
+                { 
+                    Source = pattern,
+                    Target = "tools"
+                } 
+            }
+        });
     });
     
 Task("Test-MsBuild")
     .IsDependentOn("Create-Packages")
     .Does(() =>
     {
-        DeleteDirectory("./src/Scripty.MsBuild.Test/packages", true);
+        if(DirectoryExists("./src/Scripty.MsBuild.Test/packages"))
+        {
+            DeleteDirectory("./src/Scripty.MsBuild.Test/packages", true);
+        }
         NuGetRestore("./src/Scripty.MsBuild.Test/Scripty.MsBuild.Test.sln");
         NuGetInstall("Scripty.MsBuild", new NuGetInstallSettings
         {
             NoCache = true,
-            Source = new [] { "file:///" + MakeAbsolute(buildResultDir).FullPath },
+            Source = new [] { "file:///" + MakeAbsolute(nugetRoot).FullPath },
             ExcludeVersion = true,
+            Prerelease = true,
             OutputDirectory = "./src/Scripty.MsBuild.Test/packages"
         });      
         MSBuild("./src/Scripty.MsBuild.Test/Scripty.MsBuild.Test.sln", new MSBuildSettings()
@@ -154,11 +215,12 @@ Task("Publish-Packages")
     });
     
 Task("Publish-Release")
+    .IsDependentOn("Zip-Files")
     .WithCriteria(() => isLocal)
     // TODO: Add criteria that makes sure this is the master branch
     .Does(() =>
     {
-        var githubToken = EnvironmentVariable("SCRIPTBUILDTOOLS_GITHUB_TOKEN");
+        var githubToken = EnvironmentVariable("SCRIPTY_GITHUB_TOKEN");
         if (string.IsNullOrEmpty(githubToken))
         {
             throw new InvalidOperationException("Could not resolve GitHub token.");
@@ -175,6 +237,12 @@ Task("Publish-Release")
             Prerelease = true,
             TargetCommitish = "master"
         }).Result;
+        
+        var zipPath = buildResultDir + File(zipFile);
+        using (var zipStream = System.IO.File.OpenRead(zipPath.Path.FullPath))
+        {
+            var releaseAsset = github.Release.UploadAsset(release, new ReleaseAssetUpload(zipFile, "application/zip", zipStream, null)).Result;
+        }
     });
     
 Task("Update-AppVeyor-Build-Number")
@@ -183,26 +251,42 @@ Task("Update-AppVeyor-Build-Number")
     {
         AppVeyor.UpdateBuildVersion(semVersion);
     });
+
+Task("Upload-AppVeyor-Artifacts")
+    .IsDependentOn("Zip-Files")
+    .WithCriteria(() => isRunningOnAppVeyor)
+    .Does(() =>
+    {
+        var artifact = buildResultDir + File(zipFile);
+        AppVeyor.UploadArtifact(artifact);
+    });
     
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
     
+Task("Create-Packages")
+    .IsDependentOn("Create-Library-Packages")   
+    .IsDependentOn("Create-Tools-Package");
+    
 Task("Package")
-    .IsDependentOn("Create-Packages");
+    .IsDependentOn("Zip-Files")
+    .IsDependentOn("Create-Packages")
+    .IsDependentOn("Test-MsBuild");
     
 Task("Test")
     .IsDependentOn("Test-MsBuild");
 
 Task("Default")
-    .IsDependentOn("Test");
+    .IsDependentOn("Package");
 
 Task("Publish")
     .IsDependentOn("Publish-Packages")
     .IsDependentOn("Publish-Release");
     
 Task("AppVeyor")
-    .IsDependentOn("Update-AppVeyor-Build-Number");
+    .IsDependentOn("Update-AppVeyor-Build-Number")
+    .IsDependentOn("Upload-AppVeyor-Artifacts");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

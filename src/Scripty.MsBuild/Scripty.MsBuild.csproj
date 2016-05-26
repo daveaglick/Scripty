@@ -50,6 +50,7 @@
     <Compile Include="ScriptyTask.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Scripty.MsBuild.targets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>

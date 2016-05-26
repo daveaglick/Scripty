@@ -47,7 +47,7 @@ namespace Scripty.Core
 
         private string FilePath { get; set; }
 
-        public TextWriter this[string filePath]
+        public OutputFile this[string filePath]
         {
             get
             {
@@ -73,6 +73,12 @@ namespace Scripty.Core
         }
 
         internal ICollection<IOutputFileInfo> OutputFiles => _outputFiles.Values.Cast<IOutputFileInfo>().ToList();
+
+        public bool Compile
+        {
+            get { return this[FilePath].Compile; }
+            set { this[FilePath].Compile = value; }
+        }
 
         public override void Close() => this[FilePath].Close();
 
