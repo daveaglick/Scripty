@@ -123,9 +123,11 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="BuildAction.cs" />
     <Compile Include="IOutputFileInfo.cs" />
     <Compile Include="OutputFileCollection.cs" />
     <Compile Include="OutputFile.cs" />
+    <Compile Include="ScriptError.cs" />
     <Compile Include="ScriptGlobals.cs" />
     <Compile Include="ScriptResult.cs" />
     <Compile Include="ScriptSource.cs" />

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Scripty.Core
 {
-    public class OutputFileCollection : TextWriter
+    public class OutputFileCollection : TextWriter, IOutputFileInfo
     {
         private readonly string _scriptFilePath;
         private readonly Dictionary<string, OutputFile> _outputFiles
@@ -45,7 +45,7 @@ namespace Scripty.Core
             }
         }
 
-        private string FilePath { get; set; }
+        public string FilePath { get; }
 
         public OutputFile this[string filePath]
         {
@@ -74,10 +74,10 @@ namespace Scripty.Core
 
         internal ICollection<IOutputFileInfo> OutputFiles => _outputFiles.Values.Cast<IOutputFileInfo>().ToList();
 
-        public bool Compile
+        public BuildAction BuildAction
         {
-            get { return this[FilePath].Compile; }
-            set { this[FilePath].Compile = value; }
+            get { return this[FilePath].BuildAction; }
+            set { this[FilePath].BuildAction = value; }
         }
 
         public override void Close() => this[FilePath].Close();

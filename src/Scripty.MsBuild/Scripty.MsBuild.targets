@@ -14,10 +14,22 @@
 
   <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" BeforeTargets="BeforeCompile">
     <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" ScriptFiles="@(ScriptFiles)">
+      <Output TaskParameter="NoneFiles" ItemName="NoneFiles" />
       <Output TaskParameter="CompileFiles" ItemName="CompileFiles" />
+      <Output TaskParameter="ContentFiles" ItemName="ContentFiles" />
+      <Output TaskParameter="EmbeddedResourceFiles" ItemName="EmbeddedResourceFiles" />
     </ScriptyTask>
     <ItemGroup>
+      <None Include="@(NoneFiles)" />
+    </ItemGroup>
+    <ItemGroup>
       <Compile Include="@(CompileFiles)" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="@(ContentFiles)" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="@(EmbeddedResourceFiles)" />
     </ItemGroup>
   </Target>
 </Project>

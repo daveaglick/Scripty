@@ -60,17 +60,34 @@ namespace Scripty.Core
                 catch (CompilationErrorException compilationError)
                 {
                     return new ScriptResult(globals.Output.OutputFiles,
-                        compilationError.Diagnostics.Select(x => x.ToString()).ToList());
+                        compilationError.Diagnostics
+                            .Select(x => new ScriptError
+                            {
+                                Message = x.GetMessage(),
+                                Line = x.Location.GetLineSpan().StartLinePosition.Line,
+                                Column = x.Location.GetLineSpan().StartLinePosition.Character
+                            })
+                            .ToList());
                 }
                 catch (AggregateException aggregateException)
                 {
                     return new ScriptResult(globals.Output.OutputFiles,
-                        aggregateException.InnerExceptions.Select(x => x.ToString()).ToList());
+                        aggregateException.InnerExceptions
+                            .Select(x => new ScriptError
+                            {
+                                Message = x.ToString()
+                            }).ToList());
                 }
                 catch (Exception ex)
                 {
                     return new ScriptResult(globals.Output.OutputFiles,
-                        new [] { ex.ToString() });
+                        new []
+                        {
+                            new ScriptError
+                            {
+                                Message = ex.ToString()
+                            }
+                        });
                 }
                 return new ScriptResult(globals.Output.OutputFiles);
             }

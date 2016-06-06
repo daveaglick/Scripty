@@ -82,15 +82,15 @@ namespace Scripty
             foreach (Task<ScriptResult> task in tasks.Where(x => x.Status == TaskStatus.RanToCompletion))
             {
                 // Check for any errors
-                foreach (string error in task.Result.Errors)
+                foreach (ScriptError error in task.Result.Errors)
                 {
-                    Console.Error.WriteLine(error);
+                    Console.Error.WriteLine($"{error.Message} [{error.Line},{error.Column}]");
                 }
 
-                // Output the set of files to compile
-                foreach (string compileFilePath in task.Result.OutputFiles.Where(x => x.Compile).Select(x => x.FilePath))
+                // Output the set of generated files w/ build actions
+                foreach (IOutputFileInfo outputFile in task.Result.OutputFiles)
                 {
-                    Console.WriteLine(compileFilePath);
+                    Console.WriteLine($"{outputFile.BuildAction}|{outputFile.FilePath}");
                 }
             }
 

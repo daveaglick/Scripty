@@ -14,7 +14,10 @@ namespace Scripty.MsBuild
 {
     public class ScriptyTask : Microsoft.Build.Utilities.Task
     {
+        private readonly List<ITaskItem> _noneFiles = new List<ITaskItem>();
         private readonly List<ITaskItem> _compileFiles = new List<ITaskItem>();
+        private readonly List<ITaskItem> _contentFiles = new List<ITaskItem>();
+        private readonly List<ITaskItem> _embeddedResourceFiles = new List<ITaskItem>();
 
         [Required]
         public string ProjectFilePath { get; set; }
@@ -22,7 +25,16 @@ namespace Scripty.MsBuild
         public ITaskItem[] ScriptFiles { get; set; }
 
         [Output]
+        public ITaskItem[] NoneFiles => _noneFiles.ToArray();
+
+        [Output]
         public ITaskItem[] CompileFiles => _compileFiles.ToArray();
+
+        [Output]
+        public ITaskItem[] ContentFiles => _contentFiles.ToArray();
+
+        [Output]
+        public ITaskItem[] EmbeddedResourceFiles => _embeddedResourceFiles.ToArray();
 
         public override bool Execute()
         {
@@ -86,14 +98,56 @@ namespace Scripty.MsBuild
             }
 
             // Add the compile files
-            List<string> compileFiles = outputData
+            List<Tuple<BuildAction, string>> outputFiles = outputData
                 .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
-            Log.LogMessage("Compile file count: " + compileFiles.Count);
-            _compileFiles.AddRange(compileFiles
+                .Select(x => x.Split('|'))
+                .Where(x => x.Length == 2 && !string.IsNullOrWhiteSpace(x[0]) && !string.IsNullOrWhiteSpace(x[1]))
                 .Select(x =>
                 {
-                    TaskItem taskItem = new TaskItem(x);
+                    BuildAction buildAction;
+                    if (!Enum.TryParse(x[0], out buildAction))
+                    {
+                        buildAction = BuildAction.GenerateOnly;
+                    }
+                    return new Tuple<BuildAction, string>(buildAction, x[1]);
+                })
+                .Where(x => x.Item1 != BuildAction.GenerateOnly)
+                .ToList();
+
+            Log.LogMessage("Output file count: " + outputFiles.Count);
+
+            _noneFiles.AddRange(outputFiles
+                .Where(x => x.Item1 == BuildAction.None)
+                .Select(x =>
+                {
+                    TaskItem taskItem = new TaskItem(x.Item2);
+                    taskItem.SetMetadata("AutoGen", "true");
+                    return taskItem;
+                }));
+
+            _compileFiles.AddRange(outputFiles
+                .Where(x => x.Item1 == BuildAction.Compile)
+                .Select(x =>
+                {
+                    TaskItem taskItem = new TaskItem(x.Item2);
+                    taskItem.SetMetadata("AutoGen", "true");
+                    return taskItem;
+                }));
+
+            _contentFiles.AddRange(outputFiles
+                .Where(x => x.Item1 == BuildAction.Content)
+                .Select(x =>
+                {
+                    TaskItem taskItem = new TaskItem(x.Item2);
+                    taskItem.SetMetadata("AutoGen", "true");
+                    return taskItem;
+                }));
+
+            _embeddedResourceFiles.AddRange(outputFiles
+                .Where(x => x.Item1 == BuildAction.EmbeddedResource)
+                .Select(x =>
+                {
+                    TaskItem taskItem = new TaskItem(x.Item2);
                     taskItem.SetMetadata("AutoGen", "true");
                     return taskItem;
                 }));
