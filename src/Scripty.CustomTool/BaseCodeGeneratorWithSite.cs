@@ -1,30 +1,37 @@
-﻿using System;
+﻿
+/***************************************************************************
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+This code is licensed under the Visual Studio SDK license terms.
+THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
+ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
+IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
+PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
+
+***************************************************************************/
+
+using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Designer.Interfaces;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
+using VSOLE = Microsoft.VisualStudio.OLE.Interop;
 
-namespace Scripty.CustomTool
+namespace Scripty
 {
-    // From https://github.com/Microsoft/VSSDK-Extensibility-Samples/tree/master/Single_File_Generator
     /// <summary>
     /// Base code generator with site implementation
     /// </summary>
-    public abstract class BaseCodeGeneratorWithSite : BaseCodeGenerator, IObjectWithSite
+    public abstract class BaseCodeGeneratorWithSite : BaseCodeGenerator, VSOLE.IObjectWithSite
     {
-        private object _site = null;
-        private CodeDomProvider _codeDomProvider = null;
-        private ServiceProvider _serviceProvider = null;
+        private object site = null;
+        private CodeDomProvider codeDomProvider = null;
+        private ServiceProvider serviceProvider = null;
 
         #region IObjectWithSite Members
 
@@ -33,14 +40,14 @@ namespace Scripty.CustomTool
         /// </summary>
         /// <param name="riid">interface to get</param>
         /// <param name="ppvSite">IntPtr in which to stuff return value</param>
-        void IObjectWithSite.GetSite(ref Guid riid, out IntPtr ppvSite)
+        void VSOLE.IObjectWithSite.GetSite(ref Guid riid, out IntPtr ppvSite)
         {
-            if (_site == null)
+            if (site == null)
             {
                 throw new COMException("object is not sited", VSConstants.E_FAIL);
             }
 
-            IntPtr pUnknownPointer = Marshal.GetIUnknownForObject(_site);
+            IntPtr pUnknownPointer = Marshal.GetIUnknownForObject(site);
             IntPtr intPointer = IntPtr.Zero;
             Marshal.QueryInterface(pUnknownPointer, ref riid, out intPointer);
 
@@ -56,11 +63,11 @@ namespace Scripty.CustomTool
         /// SetSite method of IOleObjectWithSite
         /// </summary>
         /// <param name="pUnkSite">site for this object to use</param>
-        void IObjectWithSite.SetSite(object pUnkSite)
+        void VSOLE.IObjectWithSite.SetSite(object pUnkSite)
         {
-            _site = pUnkSite;
-            _codeDomProvider = null;
-            _serviceProvider = null;
+            site = pUnkSite;
+            codeDomProvider = null;
+            serviceProvider = null;
         }
 
         #endregion
@@ -72,12 +79,12 @@ namespace Scripty.CustomTool
         {
             get
             {
-                if (_serviceProvider == null)
+                if (serviceProvider == null)
                 {
-                    _serviceProvider = new ServiceProvider(_site as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
-                    Debug.Assert(_serviceProvider != null, "Unable to get ServiceProvider from site object.");
+                    serviceProvider = new ServiceProvider(site as VSOLE.IServiceProvider);
+                    Debug.Assert(serviceProvider != null, "Unable to get ServiceProvider from site object.");
                 }
-                return _serviceProvider;
+                return serviceProvider;
             }
         }
 
@@ -86,14 +93,20 @@ namespace Scripty.CustomTool
         /// </summary>
         /// <param name="serviceGuid">GUID of service to retrieve</param>
         /// <returns>An object that implements the requested service</returns>
-        protected object GetService(Guid serviceGuid) => SiteServiceProvider.GetService(serviceGuid);
+        protected object GetService(Guid serviceGuid)
+        {
+            return SiteServiceProvider.GetService(serviceGuid);
+        }
 
         /// <summary>
         /// Method to get a service by its Type
         /// </summary>
         /// <param name="serviceType">Type of service to retrieve</param>
         /// <returns>An object that implements the requested service</returns>
-        protected object GetService(Type serviceType) => SiteServiceProvider.GetService(serviceType);
+        protected object GetService(Type serviceType)
+        {
+            return SiteServiceProvider.GetService(serviceType);
+        }
 
         /// <summary>
         /// Returns a CodeDomProvider object for the language of the project containing
@@ -102,21 +115,21 @@ namespace Scripty.CustomTool
         /// <returns>A CodeDomProvider object</returns>
         protected virtual CodeDomProvider GetCodeProvider()
         {
-            if (_codeDomProvider == null)
+            if (codeDomProvider == null)
             {
                 //Query for IVSMDCodeDomProvider/SVSMDCodeDomProvider for this project type
                 IVSMDCodeDomProvider provider = GetService(typeof(SVSMDCodeDomProvider)) as IVSMDCodeDomProvider;
                 if (provider != null)
                 {
-                    _codeDomProvider = provider.CodeDomProvider as CodeDomProvider;
+                    codeDomProvider = provider.CodeDomProvider as CodeDomProvider;
                 }
                 else
                 {
                     //In the case where no language specific CodeDom is available, fall back to C#
-                    _codeDomProvider = CodeDomProvider.CreateProvider("C#");
+                    codeDomProvider = CodeDomProvider.CreateProvider("C#");
                 }
             }
-            return _codeDomProvider;
+            return codeDomProvider;
         }
 
         /// <summary>
@@ -130,7 +143,7 @@ namespace Scripty.CustomTool
             string extension = codeDom.FileExtension;
             if (extension != null && extension.Length > 0)
             {
-                extension = "." + extension.TrimStart(".".ToCharArray());
+                extension = ".generated." + extension.TrimStart(".".ToCharArray());
             }
             return extension;
         }
@@ -154,23 +167,9 @@ namespace Scripty.CustomTool
         /// <returns>
         /// The EnvDTE.Project object of the project containing the project item the code generator was called on
         /// </returns>
-        protected Project GetProject() => GetProjectItem().ContainingProject;
-
-        /// <summary>
-        /// Returns the VSLangProj.VSProjectItem object that corresponds to the project item the code 
-        /// generator was called on
-        /// </summary>
-        /// <returns>The VSLangProj.VSProjectItem of the project item the code generator was called on</returns>
-        protected VSProjectItem GetVSProjectItem() => (VSProjectItem)GetProjectItem().Object;
-
-        /// <summary>
-        /// Returns the VSLangProj.VSProject object of the project containing the project item the code 
-        /// generator was called on
-        /// </summary>
-        /// <returns>
-        /// The VSLangProj.VSProject object of the project containing the project item 
-        /// the code generator was called on
-        /// </returns>
-        protected VSProject GetVSProject() => (VSProject)GetProject().Object;
+        protected Project GetProject()
+        {
+            return GetProjectItem().ContainingProject;
+        }
     }
 }

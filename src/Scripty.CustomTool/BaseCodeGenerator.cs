@@ -1,16 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+/***************************************************************************
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+This code is licensed under the Visual Studio SDK license terms.
+THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
+ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
+IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
+PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
+
+***************************************************************************/
+
+using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Scripty.CustomTool
+namespace Scripty
 {
-    // From https://github.com/Microsoft/VSSDK-Extensibility-Samples/tree/master/Single_File_Generator
     /// <summary>
     /// A managed wrapper for VS's concept of an IVsSingleFileGenerator which is
     /// a custom tool invoked at design time which can take any file as an input
@@ -18,9 +25,9 @@ namespace Scripty.CustomTool
     /// </summary>
     public abstract class BaseCodeGenerator : IVsSingleFileGenerator
     {
-        private IVsGeneratorProgress _codeGeneratorProgress;
-        private string _codeFileNameSpace = string.Empty;
-        private string _codeFilePath = string.Empty;
+        private IVsGeneratorProgress codeGeneratorProgress;
+        private string codeFileNameSpace = String.Empty;
+        private string codeFilePath = String.Empty;
 
         #region IVsSingleFileGenerator Members
 
@@ -39,8 +46,8 @@ namespace Scripty.CustomTool
             }
             catch (Exception e)
             {
-                Debug.WriteLine("The call to GetDefaultExtension() has failed due to the exception:");
-                Debug.WriteLine(e.ToString());
+                Trace.WriteLine("GetDefaultExtension failed");
+                Trace.WriteLine(e.ToString());
                 pbstrDefaultExtension = string.Empty;
                 return VSConstants.E_FAIL;
             }
@@ -64,9 +71,9 @@ namespace Scripty.CustomTool
                 throw new ArgumentNullException(bstrInputFileContents);
             }
 
-            _codeFilePath = wszInputFilePath;
-            _codeFileNameSpace = wszDefaultNamespace;
-            _codeGeneratorProgress = pGenerateProgress;
+            codeFilePath = wszInputFilePath;
+            codeFileNameSpace = wszDefaultNamespace;
+            codeGeneratorProgress = pGenerateProgress;
 
             byte[] bytes = GenerateCode(bstrInputFileContents);
 
@@ -99,17 +106,35 @@ namespace Scripty.CustomTool
         /// <summary>
         /// Namespace for the file
         /// </summary>
-        protected string FileNameSpace => _codeFileNameSpace;
+        protected string FileNameSpace
+        {
+            get
+            {
+                return codeFileNameSpace;
+            }
+        }
 
         /// <summary>
         /// File-path for the input file
         /// </summary>
-        protected string InputFilePath => _codeFilePath;
+        protected string InputFilePath
+        {
+            get
+            {
+                return codeFilePath;
+            }
+        }
 
         /// <summary>
         /// Interface to the VS shell object we use to tell our progress while we are generating
         /// </summary>
-        internal IVsGeneratorProgress CodeGeneratorProgress => _codeGeneratorProgress;
+        internal IVsGeneratorProgress CodeGeneratorProgress
+        {
+            get
+            {
+                return codeGeneratorProgress;
+            }
+        }
 
         /// <summary>
         /// Gets the default extension for this generator
@@ -131,8 +156,14 @@ namespace Scripty.CustomTool
         /// <param name="message">Text displayed to the user</param>
         /// <param name="line">Line number of error</param>
         /// <param name="column">Column number of error</param>
-        protected virtual void GeneratorError(uint level, string message, uint line, uint column) => 
-            CodeGeneratorProgress?.GeneratorError(0, level, message, line, column);
+        protected virtual void GeneratorError(uint level, string message, uint line, uint column)
+        {
+            IVsGeneratorProgress progress = CodeGeneratorProgress;
+            if (progress != null)
+            {
+                progress.GeneratorError(0, level, message, line, column);
+            }
+        }
 
         /// <summary>
         /// Method that will communicate a warning via the shell callback mechanism
@@ -141,7 +172,13 @@ namespace Scripty.CustomTool
         /// <param name="message">Text displayed to the user</param>
         /// <param name="line">Line number of warning</param>
         /// <param name="column">Column number of warning</param>
-        protected virtual void GeneratorWarning(uint level, string message, uint line, uint column) => 
-            CodeGeneratorProgress?.GeneratorError(1, level, message, line, column);
+        protected virtual void GeneratorWarning(uint level, string message, uint line, uint column)
+        {
+            IVsGeneratorProgress progress = CodeGeneratorProgress;
+            if (progress != null)
+            {
+                progress.GeneratorError(1, level, message, line, column);
+            }
+        }
     }
 }

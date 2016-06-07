@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="f44be2f6-1131-4aab-a516-0527c8c60618" Version="1.0" Language="en-US" Publisher="Dave Glick" />
-    <DisplayName>Scripty.CustomTool</DisplayName>
+    <Identity Id="Scripty.CustomTool" Version="1.0.0.0" Language="en-US" Publisher="Dave Glick" />
+    <DisplayName>Scripty</DisplayName>
     <Description xml:space="preserve">Runs Scripty as a custom tool.</Description>
     <MoreInfo>https://github.com/daveaglick/Scripty</MoreInfo>
   </Metadata>
   <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="14.0" />
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="15.0" />
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="14.0" />
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="15.0" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[11.0,)" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0,)" />
   </Installation>
   <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-    <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0,15.0)" />
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.6,)" />
   </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+  </Assets>
 </PackageManifest>

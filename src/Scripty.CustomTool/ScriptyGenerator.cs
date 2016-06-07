@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Scripty.Core;
-using VSLangProj80;
 
-namespace Scripty.CustomTool
+namespace Scripty
 {
     /// <summary>
     /// This is the generator class. 
@@ -20,10 +19,8 @@ namespace Scripty.CustomTool
     /// </summary>
     [ComVisible(true)]
     [Guid("1B8589A2-58FF-4413-9EA3-A66A1605F1E4")]
-    [CodeGeneratorRegistration(typeof(ScriptyGenerator), "C# Scripty Generator", vsContextGuids.vsContextGuidVCSProject,
-        GeneratesDesignTimeSource = true)]
-    [CodeGeneratorRegistration(typeof(ScriptyGenerator), "VB Scripty Generator", vsContextGuids.vsContextGuidVBProject,
-        GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(ScriptyGenerator), "C# Scripty Generator", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(ScriptyGenerator), "VB.NET Scripty Generator", "{164B10B9-B200-11D0-8C61-00A0C91E29D5}", GeneratesDesignTimeSource = true)]
     [ProvideObject(typeof(ScriptyGenerator))]
     public class ScriptyGenerator : BaseCodeGeneratorWithSite
     {
@@ -84,7 +81,7 @@ namespace Scripty.CustomTool
                 if (File.Exists(logPath))
                 {
                     string[] logLines = File.ReadAllLines(logPath);
-                    foreach (string fileToRemove in logLines.Where(x => result.OutputFiles.Any(y => y.FilePath == x)))
+                    foreach (string fileToRemove in logLines.Where(x => result.OutputFiles.All(y => y.FilePath != x)))
                     {
                         solution.FindProjectItem(fileToRemove)?.Delete();
                     }
