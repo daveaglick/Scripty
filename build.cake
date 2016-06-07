@@ -4,9 +4,11 @@
 
 // Publishing workflow:
 // - Update ReleaseNotes.md
+// - Update the version in Scripty.CustomTool/source.extension.vsixmanifest
 // - Run a normal build with Cake to set SolutionInfo.cs in the repo ("build.cmd")
 // - Run a Publish build with Cake ("build.cmd --target Publish")
 // - No need to add a version tag to the repo - added by GitHub on publish
+// - Manually upload the .vsix in src\artifacts to the Visual Studio Gallery
 
 #addin "Cake.FileHelpers"
 #addin "Octokit"
@@ -31,7 +33,7 @@ var buildNumber = AppVeyor.Environment.Build.Number;
 var releaseNotes = ParseReleaseNotes("./ReleaseNotes.md");
 
 var version = releaseNotes.Version.ToString();
-var semVersion = version + (isLocal ? "-beta" : string.Concat("-build-", buildNumber));
+var semVersion = version + (isLocal ? string.Empty : string.Concat("-build-", buildNumber));
 
 var buildDir = Directory("./src/Scripty/bin") + Directory(configuration);
 var buildResultDir = Directory("./build") + Directory(semVersion);
@@ -87,6 +89,7 @@ Task("Build")
         MSBuild("./src/Scripty.sln", new MSBuildSettings()
             .SetConfiguration(configuration)
             .SetVerbosity(Verbosity.Minimal)
+            .SetMSBuildPlatform(MSBuildPlatform.x86)
         );
     });
 

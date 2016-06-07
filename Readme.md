@@ -4,7 +4,7 @@ Tools to let you use Roslyn-powered C# scripts for code generation. You can thin
 
 ## Quick Start
 
-The easiest way to get up and running is to install the `Scripty.MsBuild` NuGet package into an existing project (it's currently pre-release so you'll have to specify to allow pre-release packages). Then just create a script file with a `.csx` extension, add it to your project, and watch the magic happen on your next build.
+The easiest way to get up and running is to install the `Scripty.MsBuild` NuGet package into an existing project. Then just create a script file with a `.csx` extension, add it to your project, and watch the magic happen on your next build. Alternativly, you can install the Scripty Visual Studio extension to add custom tool support for code generation outside the build process.
 
 ## Scripts
 
@@ -102,9 +102,11 @@ By default, all files in the project with the `.csx` extension are evaluated. Yo
 
 Files that get generated using the MsBuild task are included during compilation (as long as their `Compile` flag is set in the script), but not in the project (unless your script modifies the project to include them). If you'd like to have them in the project as well (for example, to enable Intellisense) just include them manually after the first generation. You may want to also commit an empty placeholder file to any shared repository if you do include generated files in the project so that people obtaining the project won't get a missing file prior to their first build.
 
-### Scripty.CustomTool (Planned)
+### Scripty.CustomTool
 
 This library provides a single file generator (otherwise known as a custom tool) in Visual Studio that can be used to evaluate Scripty scripts whenever the underlying script file changes. Unlike `Scripty.MsBuild`, generated output from the scripts will get automatically included in the project. This library and `Scripty.MsBuild` can be used together to provide script evaluation on changes *and* on build.
+
+The generator is provided as a Visual Studio extension and you can install it from the gallery (just search for "Scripty"). To use it, set the "Custom Tool" property for any `.csx` file to "ScriptyGenerator". After setting the custom tool. Scripty will automatically run whenever the underlying script is saved or when you right-click the script and select "Run Custom Tool."
 
 ### Scripty
 
