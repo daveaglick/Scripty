@@ -53,7 +53,7 @@ class Foo
 }}");
 ```
 
-This will output the following generated code:
+Given the above script named `script.csx`, the following generated code will be output to `script.cs`:
 
 ```
 class Foo
@@ -62,31 +62,56 @@ class Foo
 }
 ```
 
-You can change the default output file by setting `Output.FilePath`. You can also do this partway through the generation to output multiple files.
-
-```
-// myscript.csx
-Output.WriteLine("// Foo"); // Output to myscript.cs
-Output.FilePath = "bar.txt";
-Output.WriteLine("BAR!"); // Output to bar.txt 
-```
-
-Alternatively, can output more than one file by using the `Output` indexer.
+You can output more than one file by using the `Output` indexer.
 
 ```
 Output["other.cs"].WriteLine("// Another file");
 ```
 
-You can also control whether the generated file is included in the compilation with the `Compile` flag. By default, any output file that ends in `.cs` is compiled and all others are not.
+* `BuildAction`
+
+You can also control the build action for the generated file using the `BuildAction` property. By default, any output file that ends in `.cs` is compiled and all others are included in the project but not compiled (I.e., a build action of "None"). The `BuildAction` property takes the following enum:
 
 ```
-Output.Compile = false;
-Output["other.cs"].Compile = true;
+public enum BuildAction
+{
+    /// <summary>
+    /// Only generates the file but does not add it to the project.
+    /// </summary>
+    GenerateOnly,
+
+    /// <summary>
+    /// Adds the file to the project and does not set a build action.
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// Adds the file to the project and sets the compile build action.
+    /// </summary>
+    Compile,
+
+    /// <summary>
+    /// Adds the file to the project and sets the content build action.
+    /// </summary>
+    Content,
+
+    /// <summary>
+    /// Adds the file to the project and sets the embedded resource build action.
+    /// </summary>
+    EmbeddedResource
+}
+```
+
+For example, to set the build action for the default generated file and an alternate generated file you would write:
+
+```
+Output.BuildAction = BuildAction.None;
+Output["embedded.xml"].BuildAction = BuildAction.EmbeddedResource;
 ```
 
 ## Libraries
 
-Scripty support is provided via a variety of libraries (and corresponding NuGet packages) for different scenarios. Note that because Scripty is still in beta, **you'll need to search pre-release packages** to find them.
+Scripty support is provided via a variety of libraries (and corresponding NuGet packages) for different scenarios.
 
 ### Scripty.MsBuild
 
@@ -128,3 +153,7 @@ This library is the foundation of Scripty and can be used if you want to embed S
 ### Cake.Scripty (Planned)
 
 A Cake addin for Scripty that allows you to evaluate Scripty scripts in Cake. Note that the recommended approach is to use the `Scripty.MsBuild` library so that you also get Scripty evaluation when building from Visual Studio, in which case this addin isn't needed if you're calling MsBuild from Cake (which most Cake scripts do). However, this addin lets you integrate Scripty evaluation into Cake in situations when you want to completely replace MsBuild.
+
+## Help!
+
+If you need help, have a feature request, or notice a bug, just submit a GitHub issue.

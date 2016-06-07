@@ -208,7 +208,7 @@ Task("Publish-Packages")
             throw new InvalidOperationException("Could not resolve NuGet API key.");
         }
 
-        foreach (var nupkg in GetFiles(buildResultDir.Path.FullPath + "/*.nupkg"))
+        foreach (var nupkg in GetFiles(nugetRoot.Path.FullPath + "/*.nupkg"))
         {
             NuGetPush(nupkg, new NuGetPushSettings 
             {
