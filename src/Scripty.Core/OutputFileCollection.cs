@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Scripty.Core
 {
-    public class OutputFileCollection : TextWriter, IOutputFileInfo
+    public class OutputFileCollection : OutputFile
     {
         private readonly string _scriptFilePath;
-        private readonly Dictionary<string, OutputFile> _outputFiles
-            = new Dictionary<string, OutputFile>();
+        private readonly Dictionary<string, OutputFileWriter> _outputFiles
+            = new Dictionary<string, OutputFileWriter>();
 
         private bool _disposed;
 
@@ -39,13 +39,11 @@ namespace Scripty.Core
             }
             _disposed = true;
 
-            foreach (OutputFile outputFile in _outputFiles.Values)
+            foreach (OutputFileWriter outputFile in _outputFiles.Values)
             {
                 outputFile.Dispose();
             }
         }
-
-        public string FilePath { get; }
 
         public OutputFile this[string filePath]
         {
@@ -61,11 +59,11 @@ namespace Scripty.Core
                 }
                 
                 filePath = Path.Combine(Path.GetDirectoryName(_scriptFilePath), filePath);
-                OutputFile outputFile;
+                OutputFileWriter outputFile;
                 if (!_outputFiles.TryGetValue(filePath, out outputFile))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                    outputFile = new OutputFile(filePath);
+                    outputFile = new OutputFileWriter(filePath);
                     _outputFiles.Add(filePath, outputFile);
                 }
                 return outputFile;
@@ -74,7 +72,9 @@ namespace Scripty.Core
 
         internal ICollection<IOutputFileInfo> OutputFiles => _outputFiles.Values.Cast<IOutputFileInfo>().ToList();
 
-        public BuildAction BuildAction
+        public override string FilePath { get; }
+
+        public override BuildAction BuildAction
         {
             get { return this[FilePath].BuildAction; }
             set { this[FilePath].BuildAction = value; }

@@ -125,8 +125,9 @@
     </Compile>
     <Compile Include="BuildAction.cs" />
     <Compile Include="IOutputFileInfo.cs" />
-    <Compile Include="OutputFileCollection.cs" />
     <Compile Include="OutputFile.cs" />
+    <Compile Include="OutputFileCollection.cs" />
+    <Compile Include="OutputFileWriter.cs" />
     <Compile Include="ScriptError.cs" />
     <Compile Include="ScriptGlobals.cs" />
     <Compile Include="ScriptResult.cs" />
