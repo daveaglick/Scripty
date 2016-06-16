@@ -214,7 +214,8 @@ Task("Publish-Packages")
         {
             NuGetPush(nupkg, new NuGetPushSettings 
             {
-                ApiKey = apiKey
+                ApiKey = apiKey,
+                Source = "https://www.nuget.org/api/v2/package" // This can be removed with a new version of Cake, see #970
             });
         }
     });
