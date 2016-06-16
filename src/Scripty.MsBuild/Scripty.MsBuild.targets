@@ -1,19 +1,19 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <EvaluateScriptFiles Condition=" '$(EvaluateScriptFiles)' == '' ">true</EvaluateScriptFiles>
+    <EvaluateScriptyFiles Condition=" '$(EvaluateScriptyFiles)' == '' ">true</EvaluateScriptyFiles>
   </PropertyGroup>
   
-  <Target Name="_ResolveScriptFiles">
+  <Target Name="_ResolveScriptyFiles">
     <ItemGroup>
-      <ScriptFiles Condition=" '@(ScriptFiles)' == '' and '%(Extension)' == '.csx' " Include="@(Content);@(None)" />
-      <ScriptFiles Condition=" '@(ScriptFiles)' == '' " Include="**\*.csx" />
+      <ScriptyFile Condition=" '@(ScriptyFile)' == '' and '%(Extension)' == '.csx' " Include="@(Content);@(None)" />
+      <ScriptyFile Condition=" '@(ScriptyFile)' == '' " Include="**\*.csx" />
     </ItemGroup>
   </Target>
   
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scripty.MsBuild.dll" TaskName="ScriptyTask" />
 
-  <Target Name="EvaluateScriptFiles" DependsOnTargets="_ResolveScriptFiles" BeforeTargets="BeforeCompile">
-    <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" ScriptFiles="@(ScriptFiles)">
+  <Target Name="EvaluateScriptyFiles" DependsOnTargets="_ResolveScriptyFiles" BeforeTargets="BeforeCompile">
+    <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" ScriptFiles="@(ScriptyFile)">
       <Output TaskParameter="NoneFiles" ItemName="NoneFiles" />
       <Output TaskParameter="CompileFiles" ItemName="CompileFiles" />
       <Output TaskParameter="ContentFiles" ItemName="ContentFiles" />
