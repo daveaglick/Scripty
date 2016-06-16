@@ -45,11 +45,13 @@ namespace Scripty.Core
             ScriptOptions options = ScriptOptions.Default
                 .WithFilePath(source.FilePath)
                 .WithReferences(
-                    typeof(Project).Assembly  // Microsoft.CodeAnalysis.Workspaces
+                    typeof(Project).Assembly,  // Microsoft.CodeAnalysis.Workspaces
+                    typeof(ScriptEngine).Assembly  // Scripty.Core
                     )
                 .WithImports(
                     "System",
-                    "Microsoft.CodeAnalysis");
+                    "Microsoft.CodeAnalysis",
+                    "Scripty.Core");
 
             using (ScriptGlobals globals = new ScriptGlobals(source.FilePath, _projectFilePath, LoadProject))
             {
