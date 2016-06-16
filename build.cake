@@ -6,9 +6,11 @@
 // - Update ReleaseNotes.md
 // - Update the version in Scripty.CustomTool/source.extension.vsixmanifest
 // - Run a normal build with Cake to set SolutionInfo.cs in the repo ("build.cmd")
+// - Commit the changes to develop, switch to master, and ff merge from develop
 // - Run a Publish build with Cake ("build.cmd --target Publish")
 // - No need to add a version tag to the repo - added by GitHub on publish
 // - Manually upload the .vsix in src\artifacts to the Visual Studio Gallery
+// - Switch back to develop branch
 
 #addin "Cake.FileHelpers"
 #addin "Octokit"
