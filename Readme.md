@@ -4,7 +4,7 @@ Tools to let you use Roslyn-powered C# scripts for code generation. You can thin
 
 ## Quick Start
 
-The easiest way to get up and running is to install the `Scripty.MsBuild` NuGet package into an existing project. Then just create a script file with a `.csx` extension, add it to your project, and watch the magic happen on your next build. Alternativly, you can install the Scripty Visual Studio extension to add custom tool support for code generation outside the build process.
+The easiest way to get up and running is to install the [Scripty.MsBuild NuGet package](https://www.nuget.org/packages/Scripty.MsBuild/) into an existing project. Then just create a script file with a `.csx` extension, add it to your project, and watch the magic happen on your next build. Alternatively, you can install the [Scripty Visual Studio extension](https://visualstudiogallery.msdn.microsoft.com/52c02bb2-1d79-476e-82fb-5abfbfe6b3e4) to add custom tool support for code generation outside the build process.
 
 ## Scripts
 
@@ -21,6 +21,20 @@ The following namespaces are imported to every script by default:
 
 The following global properties are available when evaluating your script with Scripty:
 
+* `Context`
+
+This is a reference to the global `ScriptContext` class that holds each of the properties described below. You can use it to pass into a method that needs access to the full context. To put it another way, this property holds a class that contains all of the global properties in one object. This can be useful because classes and methods in the script are "lifted" and don't have access to the same global properties unscoped code does.
+
+```
+WritePaths(Context);
+
+public void WritePaths(ScriptContext context)
+{
+    context.Output.WriteLine($"Script File: {context.ScriptFilePath}");
+    context.Output.WriteLine($"Project File: {context.ProjectFilePath}");
+}
+```
+
 * `ScriptFilePath`
 
 The full path to the currently evaluating script.
@@ -31,7 +45,7 @@ The full path to the current project file.
 
 * `Project`
 
-A Roslyn `Microsoft.CodeAnalysis.Project` that represents the current project. You can use this to access the files in the project as well as other information, including getting the Roslyn compilation for the project. For example, this script will output comments with the file name of each file in the project:
+A Roslyn [`Microsoft.CodeAnalysis.Project`](http://source.roslyn.io/#Microsoft.CodeAnalysis.Workspaces/Workspace/Solution/Project.cs) that represents the current project. You can use this to access the files in the project as well as other information, including getting the Roslyn compilation for the project. For example, this script will output comments with the file name of each file in the project:
 
 ```
 foreach(Document document in Project.Documents)
@@ -39,6 +53,14 @@ foreach(Document document in Project.Documents)
     Output.WriteLine($"// {document.FilePath}");
 }
 ```
+
+Note that the Roslyn Workspace API is very different from the DTE object model Visual Studio and DTE use. It has several advantages over the DTE object model:
+* It's a core part of Roslyn, which is fundamental to the future of .NET.
+* As the .NET Core and cross-platform tooling is improved, Roslyn will adopt them quickly.
+* It makes accessing the Roslyn semantic and syntactic information for compilation objects relatively easy.
+* The skills used for writing analyzers and code fixes also apply here.
+
+That said, the documentation on Roslyn and specifically the Workspace API isn't great right now. The [Roslyn source code browser](http://source.roslyn.io) is a good place to start.
 
 * `Output`
 

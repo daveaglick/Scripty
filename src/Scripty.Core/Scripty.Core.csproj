@@ -129,7 +129,7 @@
     <Compile Include="OutputFileCollection.cs" />
     <Compile Include="OutputFileWriter.cs" />
     <Compile Include="ScriptError.cs" />
-    <Compile Include="ScriptGlobals.cs" />
+    <Compile Include="ScriptContext.cs" />
     <Compile Include="ScriptResult.cs" />
     <Compile Include="ScriptSource.cs" />
     <Compile Include="ScriptEngine.cs" />

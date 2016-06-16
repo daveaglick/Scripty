@@ -4,11 +4,11 @@ using Microsoft.CodeAnalysis;
 
 namespace Scripty.Core
 {
-    public class ScriptGlobals : IDisposable
+    public class ScriptContext : IDisposable
     {
         private readonly Func<Project> _loadProject;
 
-        internal ScriptGlobals(string scriptFilePath, string projectFilePath, Func<Project> loadProject)
+        internal ScriptContext(string scriptFilePath, string projectFilePath, Func<Project> loadProject)
         {
             if (string.IsNullOrEmpty(scriptFilePath))
             {
@@ -33,6 +33,8 @@ namespace Scripty.Core
         {
             Output.Dispose();
         }
+
+        public ScriptContext Context => this;
 
         public string ScriptFilePath { get; }
 

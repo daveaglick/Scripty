@@ -53,15 +53,15 @@ namespace Scripty.Core
                     "Microsoft.CodeAnalysis",
                     "Scripty.Core");
 
-            using (ScriptGlobals globals = new ScriptGlobals(source.FilePath, _projectFilePath, LoadProject))
+            using (ScriptContext context = new ScriptContext(source.FilePath, _projectFilePath, LoadProject))
             {
                 try
                 {
-                    await CSharpScript.EvaluateAsync(source.Code, options, globals);
+                    await CSharpScript.EvaluateAsync(source.Code, options, context);
                 }
                 catch (CompilationErrorException compilationError)
                 {
-                    return new ScriptResult(globals.Output.OutputFiles,
+                    return new ScriptResult(context.Output.OutputFiles,
                         compilationError.Diagnostics
                             .Select(x => new ScriptError
                             {
@@ -73,7 +73,7 @@ namespace Scripty.Core
                 }
                 catch (AggregateException aggregateException)
                 {
-                    return new ScriptResult(globals.Output.OutputFiles,
+                    return new ScriptResult(context.Output.OutputFiles,
                         aggregateException.InnerExceptions
                             .Select(x => new ScriptError
                             {
@@ -82,7 +82,7 @@ namespace Scripty.Core
                 }
                 catch (Exception ex)
                 {
-                    return new ScriptResult(globals.Output.OutputFiles,
+                    return new ScriptResult(context.Output.OutputFiles,
                         new []
                         {
                             new ScriptError
@@ -91,7 +91,7 @@ namespace Scripty.Core
                             }
                         });
                 }
-                return new ScriptResult(globals.Output.OutputFiles);
+                return new ScriptResult(context.Output.OutputFiles);
             }
         }
 
