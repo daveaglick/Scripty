@@ -17,7 +17,16 @@ The following namespaces are imported to every script by default:
 * `System`
 * `Microsoft.CodeAnalysis`
 
-### Globals
+### Script File Extension
+
+By default, Scripty looks for files with a `.csx` extension. This is the same extension used by standard C# scripts and there are a couple reasons why an alternate extension wasn't chosen:
+
+* `.csx` is already recognized by Visual Studio and other tooling as a Roslyn/scriptcs script and so syntax highlighting, Intellisense, etc. will automatically light up. While this could be handled in Visual Studio for a different extension, there are lots of other tools like Visual Studio Code that also have this recognition built-in.
+* While all Scripty scripts are not *necessarily* generic C# scripts because of the global properties (see below), those that don't make use of the global properties will also work with a normal C# script runner such as Roslyn or scriptcs out of the box. In addition, all normal C# scripts are also Scripty scripts. This provides some nice interoperability when you want to design a script that is both usable from Scripty and from a C# script runner. Of course, you could specify a different extension for a script when sending it to the Roslyn or scriptcs script runner, but why make it more complicated?
+
+If you don't like this behavior, it's easy to change the extension Scripty uses. For the MSBuild task you can change the extension or only process a subset of files by adding an `ItemGroup` item named `ScriptyFile` and including whatever files you want the task to process. The custom tool is opt-in to begin with since you have to set the custom tool property. You can have the custom tool process any file, `.csx` extension or not, by setting the Custom Tool property.
+
+### Global Properties
 
 The following global properties are available when evaluating your script with Scripty:
 
@@ -67,7 +76,7 @@ That said, the documentation on Roslyn and specifically the Workspace API isn't 
 A thin wrapper around `TextWriter` that should be used to output generated content. Using this object instead of direct file writing mechanisms ensures that Scripty can keep track of which files were generated and pass that information back to the build process as needed. By default, a file with the same name as the script but with a `.cs` extension is output. A handy pattern is to use script interpolation along with verbatim strings to output large chunks of code at once: 
 
 ```
-int propertyName = "Bar";
+string propertyName = "Bar";
 Output.WriteLine($@"
 class Foo 
 {{ 
