@@ -1,4 +1,4 @@
-namespace Scripty.Core
+namespace Scripty.Core.Output
 {
     public interface IOutputFileInfo
     {

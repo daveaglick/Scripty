@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Scripty.Core;
+using Scripty.Core.Output;
 
 namespace Scripty
 {

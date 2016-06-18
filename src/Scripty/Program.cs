@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Scripty.Core;
+using Scripty.Core.Output;
 
 namespace Scripty
 {

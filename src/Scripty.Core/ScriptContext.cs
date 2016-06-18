@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.MSBuild;
+using Scripty.Core.Output;
+using Scripty.Core.ProjectModel;
 
 namespace Scripty.Core
 {
     public class ScriptContext : IDisposable
     {
-        private readonly Func<Project> _loadProject;
-
-        internal ScriptContext(string scriptFilePath, string projectFilePath, Func<Project> loadProject)
+        internal ScriptContext(string scriptFilePath, string projectFilePath, ProjectTree projectTree)
         {
             if (string.IsNullOrEmpty(scriptFilePath))
             {
@@ -18,15 +18,11 @@ namespace Scripty.Core
             {
                 throw new ArgumentException("The script file path must be absolute");
             }
-            if (loadProject == null)
-            {
-                throw new ArgumentNullException(nameof(loadProject));
-            }
 
-            Output = new OutputFileCollection(scriptFilePath);
             ScriptFilePath = scriptFilePath;
             ProjectFilePath = projectFilePath;
-            _loadProject = loadProject;
+            ProjectTree = projectTree;
+            Output = new OutputFileCollection(scriptFilePath);
         }
 
         public void Dispose()
@@ -40,8 +36,8 @@ namespace Scripty.Core
 
         public string ProjectFilePath { get; }
 
-        public OutputFileCollection Output { get; }
+        public ProjectTree ProjectTree { get; }
 
-        public Project Project => _loadProject();
+        public OutputFileCollection Output { get; }
     }
 }

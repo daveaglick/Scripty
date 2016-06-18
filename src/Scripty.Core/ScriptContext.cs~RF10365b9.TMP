@@ -1,0 +1,56 @@
+using System;
+using System.IO;
+
+namespace Scripty.Core
+{
+    public class ScriptContext : IDisposable
+    {
+        private readonly Func<Microsoft.CodeAnalysis.Project> _loadAnalysisProject;
+        private readonly Func<Microsoft.Build.Evaluation.Project> _loadBuildProject;
+
+        internal ScriptContext(string scriptFilePath, string projectFilePath, 
+            Func<Microsoft.CodeAnalysis.Project> loadAnalysisProject,
+            Func<Microsoft.Build.Evaluation.Project> loadlBuildProject)
+        {
+            if (string.IsNullOrEmpty(scriptFilePath))
+            {
+                throw new ArgumentException("Value cannot be null or empty", nameof(scriptFilePath));
+            }
+            if (!Path.IsPathRooted(scriptFilePath))
+            {
+                throw new ArgumentException("The script file path must be absolute");
+            }
+            if (loadAnalysisProject == null)
+            {
+                throw new ArgumentNullException(nameof(loadAnalysisProject));
+            }
+            if (loadlBuildProject == null)
+            {
+                throw new ArgumentNullException(nameof(loadlBuildProject));
+            }
+
+            Output = new OutputFileCollection(scriptFilePath);
+            ScriptFilePath = scriptFilePath;
+            ProjectFilePath = projectFilePath;
+            _loadAnalysisProject = loadAnalysisProject;
+            _loadBuildProject = loadlBuildProject;
+        }
+
+        public void Dispose()
+        {
+            Output.Dispose();
+        }
+
+        public ScriptContext Context => this;
+
+        public string ScriptFilePath { get; }
+
+        public string ProjectFilePath { get; }
+
+        public OutputFileCollection Output { get; }
+
+        public Microsoft.CodeAnalysis.Project AnalysisProject => _loadAnalysisProject();
+
+        public Microsoft.Build.Evaluation.Project BuildProject => _loadBuildProject();
+    }
+}

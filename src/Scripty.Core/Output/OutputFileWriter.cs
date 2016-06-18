@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Scripty.Core
+namespace Scripty.Core.Output
 {
     internal class OutputFileWriter : OutputFile
     {

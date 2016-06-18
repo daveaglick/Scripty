@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Scripty.Core.Output;
 
 namespace Scripty.Core
 {

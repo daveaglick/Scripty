@@ -5,20 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.MSBuild;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.CodeAnalysis.Scripting;
+using Scripty.Core.ProjectModel;
 
 namespace Scripty.Core
 {
     public class ScriptEngine
     {
         private readonly string _projectFilePath;
-        private readonly object _projectLock = new object();
-        private Project _project;
+        private readonly ProjectTree _projectTree;
 
         public ScriptEngine(string projectFilePath)
         {
@@ -32,6 +30,7 @@ namespace Scripty.Core
             }
 
             _projectFilePath = projectFilePath;
+            _projectTree = new ProjectTree(projectFilePath);
 
             // Uncomment to pause execution while waiting for a debugger to attach
             //while (!Debugger.IsAttached)
@@ -45,15 +44,17 @@ namespace Scripty.Core
             ScriptOptions options = ScriptOptions.Default
                 .WithFilePath(source.FilePath)
                 .WithReferences(
-                    typeof(Project).Assembly,  // Microsoft.CodeAnalysis.Workspaces
+                    typeof(Microsoft.CodeAnalysis.Project).Assembly,  // Microsoft.CodeAnalysis.Workspaces
+                    typeof(Microsoft.Build.Evaluation.Project).Assembly,  // Microsoft.Build
                     typeof(ScriptEngine).Assembly  // Scripty.Core
                     )
                 .WithImports(
                     "System",
-                    "Microsoft.CodeAnalysis",
-                    "Scripty.Core");
+                    "Scripty.Core",
+                    "Scripty.Core.Output",
+                    "Scripty.Core.ProjectModel");
 
-            using (ScriptContext context = new ScriptContext(source.FilePath, _projectFilePath, LoadProject))
+            using (ScriptContext context = new ScriptContext(source.FilePath, _projectFilePath, _projectTree))
             {
                 try
                 {
@@ -95,17 +96,5 @@ namespace Scripty.Core
             }
         }
 
-        private Project LoadProject()
-        {
-            if (_project == null && !string.IsNullOrEmpty(_projectFilePath))
-            {
-                lock (_projectLock)
-                {
-                    MSBuildWorkspace workspace = MSBuildWorkspace.Create();
-                    _project = workspace.OpenProjectAsync(_projectFilePath).Result;
-                }
-            }
-            return _project;
-        }
     }
 }

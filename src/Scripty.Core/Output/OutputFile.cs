@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Scripty.Core
+namespace Scripty.Core.Output
 {
     public abstract class OutputFile : TextWriter, IOutputFileInfo
     {
