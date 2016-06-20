@@ -9,14 +9,14 @@ using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.Scripting;
-using Scripty.Core.ProjectModel;
+using Scripty.Core.ProjectTree;
 
 namespace Scripty.Core
 {
     public class ScriptEngine
     {
         private readonly string _projectFilePath;
-        private readonly ProjectTree _projectTree;
+        private readonly ProjectRoot _projectRoot;
 
         public ScriptEngine(string projectFilePath)
         {
@@ -30,7 +30,7 @@ namespace Scripty.Core
             }
 
             _projectFilePath = projectFilePath;
-            _projectTree = new ProjectTree(projectFilePath);
+            _projectRoot = new ProjectRoot(projectFilePath);
 
             // Uncomment to pause execution while waiting for a debugger to attach
             //while (!Debugger.IsAttached)
@@ -52,9 +52,9 @@ namespace Scripty.Core
                     "System",
                     "Scripty.Core",
                     "Scripty.Core.Output",
-                    "Scripty.Core.ProjectModel");
+                    "Scripty.Core.ProjectTree");
 
-            using (ScriptContext context = new ScriptContext(source.FilePath, _projectFilePath, _projectTree))
+            using (ScriptContext context = new ScriptContext(source.FilePath, _projectFilePath, _projectRoot))
             {
                 try
                 {

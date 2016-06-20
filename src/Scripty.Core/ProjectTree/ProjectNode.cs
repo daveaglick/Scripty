@@ -1,32 +1,35 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Scripty.Core.ProjectModel
+namespace Scripty.Core.ProjectTree
 {
     public class ProjectNode : IReadOnlyDictionary<string, ProjectNode>
     {
-        private readonly ProjectTree _projectTree;
+        private readonly ProjectRoot _projectRoot;
+        private readonly Dictionary<string, ProjectNode> _children = new Dictionary<string, ProjectNode>();
 
-        public ProjectNode Parent { get; }
-        public ProjectNodes Children { get; }
-        public string Name { get; }
-        public Microsoft.Build.Evaluation.ProjectItem ProjectItem { get; }
-
-        internal ProjectNode(ProjectTree projectTree, ProjectNode parent, string name,
+        protected ProjectNode(ProjectRoot projectRoot, string name, ProjectNode parent,
             Microsoft.Build.Evaluation.ProjectItem projectItem)
         {
-            _projectTree = projectTree;
-            Children = new ProjectNodes(projectTree, this);
-            Parent = parent;
+            _projectRoot = projectRoot ?? (this as ProjectRoot);
             Name = name;
+            Parent = parent;
             ProjectItem = projectItem;
         }
 
-        public Microsoft.CodeAnalysis.Document Document
+        public string Name { get; }
+
+        public ProjectNode Parent { get; }
+        
+        public virtual IReadOnlyDictionary<string, ProjectNode> Children => _children;
+
+        public Microsoft.Build.Evaluation.ProjectItem ProjectItem { get; }
+
+        public virtual Microsoft.CodeAnalysis.Document Document
         {
             get
             {
-                Microsoft.CodeAnalysis.Project analysisProject = _projectTree.Analysis;
+                Microsoft.CodeAnalysis.Project analysisProject = _projectRoot.Analysis;
                 if (analysisProject == null)
                 {
                     return null;
@@ -43,6 +46,20 @@ namespace Scripty.Core.ProjectModel
                 return analysisProject.Documents.FirstOrDefault(x => x.Folders.SequenceEqual(folders) && x.Name == Name);
             }
         }
+
+        internal ProjectNode GetOrAddChild(string name)
+        {
+            ProjectNode projectNode;
+            if (!_children.TryGetValue(name, out projectNode))
+            {
+                projectNode = new ProjectNode(_projectRoot, name, this, null);
+                _children.Add(name, projectNode);
+            }
+            return projectNode;
+        }
+
+        internal void AddChild(string name, Microsoft.Build.Evaluation.ProjectItem projectItem) =>
+            _children.Add(name, new ProjectNode(_projectRoot, name, this, projectItem));
 
         // IDictionary<string, ProjectItem>
         public bool ContainsKey(string key) => Children.ContainsKey(key);

@@ -1,23 +1,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 
-namespace Scripty.Core.ProjectModel
+namespace Scripty.Core.ProjectTree
 {
-    public class ProjectTree : IReadOnlyDictionary<string, ProjectNode>
+    public class ProjectRoot : ProjectNode
     {
         private readonly object _projectLock = new object();
         private Microsoft.CodeAnalysis.Project _analysisProject;
         private Microsoft.Build.Evaluation.Project _buildProject;
-        private ProjectNodes _nodes;
+        private bool _generatedTree;
 
-        public string FilePath { get; }
-
-        public ProjectTree(string filePath)
+        public ProjectRoot(string filePath)
+            : base(null, string.Empty, null, null)
         {
             FilePath = filePath;
         }
+
+        public string FilePath { get; }
 
         public Microsoft.CodeAnalysis.Project Analysis
         {
@@ -50,13 +52,14 @@ namespace Scripty.Core.ProjectModel
             }
         }
 
-        public ProjectNodes Children
+        public override Document Document => null;
+
+        public override IReadOnlyDictionary<string, ProjectNode> Children
         {
             get
             {
-                if(_nodes == null)
+                if(!_generatedTree)
                 {
-                    _nodes = new ProjectNodes(this, null);
                     Microsoft.Build.Evaluation.Project buildProject = Build;
                     if(buildProject != null)
                     {
@@ -77,34 +80,24 @@ namespace Scripty.Core.ProjectModel
                         {
                             string[] segments = group.Key.Split(
                                 Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                            ProjectNodes current = _nodes;
+                            ProjectNode current = this;
                             if (segments.Length > 1 || !string.IsNullOrEmpty(segments[0]))
                             {
                                 foreach (string segment in segments)
                                 {
-                                    ProjectNode folderNode = current.GetOrAdd(segment);
-                                    current = folderNode.Children;
+                                    current = current.GetOrAddChild(segment);
                                 }
                             }
                             foreach (var item in group)
                             {
-                                current.Add(item.FileName, item.ProjectItem);
+                                current.AddChild(item.FileName, item.ProjectItem);
                             }
                         }
                     }
+                    _generatedTree = true;
                 }
-                return _nodes;
+                return Children;
             }
         }
-
-        // IDictionary<string, ProjectItem>
-        public bool ContainsKey(string key) => Children.ContainsKey(key);
-        public bool TryGetValue(string key, out ProjectNode value) => Children.TryGetValue(key, out value);
-        public ProjectNode this[string key] => Children[key];
-        public IEnumerable<string> Keys => Children.Keys;
-        public IEnumerable<ProjectNode> Values => Children.Values;
-        public IEnumerator<KeyValuePair<string, ProjectNode>> GetEnumerator() => Children.GetEnumerator();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
-        public int Count => Children.Count;
     }
 }

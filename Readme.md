@@ -18,8 +18,8 @@ The following references are added to every script by default:
 The following namespaces are imported to every script by default:
 * `System`
 * `Scripty.Core`
-* `Scripty.Core.ProjectModel`
 * `Scripty.Core.Output`
+* `Scripty.Core.ProjectTree`
 
 ## Script File Extension
 
@@ -34,93 +34,79 @@ If you don't like this behavior, it's easy to change the extension Scripty uses.
 
 The following global properties are available when evaluating your script with Scripty:
 
-### `Context`
----
+* `Context`
 
-This is a reference to the global `ScriptContext` class that holds each of the properties described below. You can use it to pass into a method that needs access to the full context. To put it another way, this property holds a class that contains all of the global properties in one object. This can be useful because classes and methods in the script are "lifted" and don't have access to the same global properties unscoped code does.
+  This is a reference to the global `ScriptContext` class that holds each of the properties described below. You can use it to pass into a method that needs access to the full context. To put it another way, this property holds a class that contains all of the global properties in one object. This can be useful because classes and methods in the script are "lifted" and don't have access to the same global properties unscoped code does.
 
-```
-WritePaths(Context);
+  ```
+  WritePaths(Context);
 
-public void WritePaths(ScriptContext context)
-{
+  public void WritePaths(ScriptContext context)
+  {
     context.Output.WriteLine($"Script File: {context.ScriptFilePath}");
     context.Output.WriteLine($"Project File: {context.ProjectFilePath}");
-}
-```
+  }
+  ```
 
-### `ScriptFilePath`
----
+* `ScriptFilePath`
 
-The full path to the currently evaluating script.
+  The full path to the currently evaluating script.
 
-### `ProjectFilePath`
----
+* `ProjectFilePath`
 
-The full path to the current project file.
+  The full path to the current project file.
 
-### `ProjectTree`
----
+* `Project`
 
-A leaky abstraction over both the MSBuild API and the Roslyn Workspaces API. This object allows you to traverse a hierarchical model of the project, providing access to the MSBuild `ProjectItem` and Roslyn `Document` for any item. Two other classes, `ProjectNode` and `ProjectNodes` are also part of the Scripty project abstraction.
+  A leaky abstraction over both the MSBuild API and the Roslyn Workspaces API. This object allows you to traverse a hierarchical model of the project, providing access to the MSBuild `ProjectItem` and Roslyn `Document` for any item. This property is a `ProjectRoot` that exposes other `ProjectNode` objects by implementing `IReadOnlyDictionary<string, ProjectNode>` (or you can also access child nodes via the `Children` property).
+ 
+  * `Analysis`
 
-In addition to exposing a collection of `ProjectNode` through the `Project.Children` property (see below), the `ProjectTree` class also implements `IReadOnlyDictionary<string, ProjectNode>`.
+    A Roslyn [`Microsoft.CodeAnalysis.Project`](http://source.roslyn.io/#Microsoft.CodeAnalysis.Workspaces/Workspace/Solution/Project.cs) that represents the current project. You can use this to access the files in the project as well as other information, including getting the compilation for the project. For example, this script will output comments with the path of each source file in the project:
 
-* `ProjectTree.Analysis`
+    ```
+    using Microsoft.CodeAnalysis;
 
-A Roslyn [`Microsoft.CodeAnalysis.Project`](http://source.roslyn.io/#Microsoft.CodeAnalysis.Workspaces/Workspace/Solution/Project.cs) that represents the current project. You can use this to access the files in the project as well as other information, including getting the compilation for the project. For example, this script will output comments with the path of each source file in the project:
+    foreach(Document document in Project.Analysis.Documents)
+    {
+        Output.WriteLine($"// {document.FilePath}");
+    }
+    ```
 
-```
-using Microsoft.CodeAnalysis;
+    The documentation on Roslyn and specifically the Workspace API isn't great right now. The [Roslyn source code browser](http://source.roslyn.io) is a good place to start.
 
-foreach(Document document in ProjectTree.Analysis.Documents)
-{
-    Output.WriteLine($"// {document.FilePath}");
-}
-```
+  * `Build`
 
-The documentation on Roslyn and specifically the Workspace API isn't great right now. The [Roslyn source code browser](http://source.roslyn.io) is a good place to start.
+    A `Microsoft.Build.Evaluation.Project`. This API and the Roslyn Workspaces API exposed in the `Analysis` property have overlapping functionality, but are also complementary. While the Roslyn Workspaces API is more focused on the compilation, the MSBuild API is more focused on the makeup of the project file. Similar to the example for the Roslyn API, this script will output comments with the path of each source file in the project using the MSBuild API:
 
-* `ProjectTree.Build`
+    ```
+    using Microsoft.Build.Evaluation;
 
-A `Microsoft.Build.Evaluation.Project`. This API and the Roslyn Workspaces API exposed in the `ProjectTree.Analysis` property have overlapping functionality, but are also complementary. While the Roslyn Workspaces API is more focused on the compilation, the MSBuild API is more focused on the makeup of the project file. Similar to the example for the Roslyn API, this script will output comments with the path of each source file in the project using the MSBuild API:
+    foreach(ProjectItem item in Project.Build.Items.Where(x => x.ItemType == "Compile"))
+    {
+      Output.WriteLine($"// {item.EvaluatedInclude}");
+    }
+    ```
 
-```
-using Microsoft.Build.Evaluation;
+  * `Children`
 
-foreach(ProjectItem item in ProjectTree.Build.Items.Where(x => x.ItemType == "Compile"))
-{
-    Output.WriteLine($"// {item.EvaluatedInclude}");
-}
-```
+    A `IReadOnlyDictionary<string, ProjectNode>` collection that contains the children of the current node.
 
-* `ProjectTree.Children`
+  * `Parent`
 
-A `ProjectNodes` collection that implements `IReadOnlyDictionary<string, ProjectNode>`.
+    The parent `ProjectNode`.
 
-* `ProjectNode`
+  * `Name`
 
-The `ProjectTree` and `ProjectTree.Children` properties implement `IReadOnlyDictionary<string, ProjectNode>`. A `ProjectNode` acts as a leaky abstraction over project information from both MSBuild and Roslyn, allowing you to get the underlying MSBuild `Microsoft.Build.Evaluation.ProjectItem` as well as the corresponding `Microsoft.CodeAnalysis.Document` (if there is one). A `ProjectNode` can also represent a folder in which case it will have child nodes but no MSBuild or Roslyn objects.
+    The name of this node (folder or file name). This is `string.Empty` for the root node.
 
-* `ProjectNode.Parent`
+  * `ProjectItem`
 
-The parent `ProjectNode`.
+    The MSBuild `Microsoft.Build.Evaluation.ProjectItem`. This is `null` for the root node.
 
-* `ProjectNode.Children`
+  * `Document`
 
-A `ProjectNodes` collection of child nodes that implements `IReadOnlyDictionary<string, ProjectNode>`.
-
-* `ProjectNode.Name`
-
-The name of this node (folder or file name).
-
-* `ProjectNode.ProjectItem`
-
-The MSBuild `Microsoft.Build.Evaluation.ProjectItem`.
-
-* `ProjectItem.Document`
-
-The Roslyn `Microsoft.CodeAnalysis.Document` if there is one. Not all project items have a Roslyn document since Roslyn generally only supports source code files at this time.
+    The Roslyn `Microsoft.CodeAnalysis.Document` if there is one. Not all project items have a Roslyn document since Roslyn generally only supports source code files at this time. This is `null` for the root node.
 
 
 ### `Output`

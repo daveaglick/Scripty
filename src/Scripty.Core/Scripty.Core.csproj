@@ -152,9 +152,8 @@
     <Compile Include="Output\OutputFile.cs" />
     <Compile Include="Output\OutputFileCollection.cs" />
     <Compile Include="Output\OutputFileWriter.cs" />
-    <Compile Include="ProjectModel\ProjectTree.cs" />
-    <Compile Include="ProjectModel\ProjectNode.cs" />
-    <Compile Include="ProjectModel\ProjectNodes.cs" />
+    <Compile Include="ProjectTree\ProjectNode.cs" />
+    <Compile Include="ProjectTree\ProjectRoot.cs" />
     <Compile Include="ScriptError.cs" />
     <Compile Include="ScriptContext.cs" />
     <Compile Include="ScriptResult.cs" />

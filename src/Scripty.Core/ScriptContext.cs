@@ -2,13 +2,13 @@ using System;
 using System.IO;
 using Microsoft.CodeAnalysis.MSBuild;
 using Scripty.Core.Output;
-using Scripty.Core.ProjectModel;
+using Scripty.Core.ProjectTree;
 
 namespace Scripty.Core
 {
     public class ScriptContext : IDisposable
     {
-        internal ScriptContext(string scriptFilePath, string projectFilePath, ProjectTree projectTree)
+        internal ScriptContext(string scriptFilePath, string projectFilePath, ProjectRoot projectRoot)
         {
             if (string.IsNullOrEmpty(scriptFilePath))
             {
@@ -21,7 +21,7 @@ namespace Scripty.Core
 
             ScriptFilePath = scriptFilePath;
             ProjectFilePath = projectFilePath;
-            ProjectTree = projectTree;
+            Project = projectRoot;
             Output = new OutputFileCollection(scriptFilePath);
         }
 
@@ -36,7 +36,7 @@ namespace Scripty.Core
 
         public string ProjectFilePath { get; }
 
-        public ProjectTree ProjectTree { get; }
+        public ProjectRoot Project { get; }
 
         public OutputFileCollection Output { get; }
     }
