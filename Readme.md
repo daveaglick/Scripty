@@ -108,76 +108,74 @@ The following global properties are available when evaluating your script with S
 
     The Roslyn `Microsoft.CodeAnalysis.Document` if there is one. Not all project items have a Roslyn document since Roslyn generally only supports source code files at this time. This is `null` for the root node.
 
+* `Output`
 
-### `Output`
----
+  A thin wrapper around `TextWriter` that should be used to output generated content. Using this object instead of direct file writing mechanisms ensures that Scripty can keep track of which files were generated and pass that information back to the build process as needed. By default, a file with the same name as the script but with a `.cs` extension is output. A handy pattern is to use script interpolation along with verbatim strings to output large chunks of code at once: 
 
-A thin wrapper around `TextWriter` that should be used to output generated content. Using this object instead of direct file writing mechanisms ensures that Scripty can keep track of which files were generated and pass that information back to the build process as needed. By default, a file with the same name as the script but with a `.cs` extension is output. A handy pattern is to use script interpolation along with verbatim strings to output large chunks of code at once: 
-
-```
-string propertyName = "Bar";
-Output.WriteLine($@"
-class Foo 
-{{ 
+  ```
+  string propertyName = "Bar";
+  Output.WriteLine($@"
+  class Foo 
+  {{ 
     int {propertyName} => 42; 
-}}");
-```
+  }}");
+  ```
 
-Given the above script named `script.csx`, the following generated code will be output to `script.cs`:
+  Given the above script named `script.csx`, the following generated code will be output to `script.cs`:
 
-```
-class Foo
-{
+  ```
+  class Foo
+  {
     int Bar => 42;
-}
-```
+  }
+  ```
 
-You can output more than one file by using the `Output` indexer.
+  You can output more than one file by using the `Output` indexer.
 
-```
-Output["other.cs"].WriteLine("// Another file");
-```
+  ```
+  Output["other.cs"].WriteLine("// Another file");
+  ```
 
-* `Output.BuildAction`
+  * `BuildAction`
 
-You can also control the build action for the generated file using the `BuildAction` property. By default, any output file that ends in `.cs` is compiled and all others are included in the project but not compiled (I.e., a build action of "None"). The `BuildAction` property takes the following enum:
+    You can also control the build action for the generated file using the `BuildAction` property. By default, any output file that ends in `.cs` is compiled and all others are included in the project but not compiled (I.e., a build action of "None"). The `BuildAction` property takes the following enum:
 
-```
-public enum BuildAction
-{
-    /// <summary>
-    /// Only generates the file but does not add it to the project.
-    /// </summary>
-    GenerateOnly,
+    ```
+    public enum BuildAction
+    {
+      /// <summary>
+      /// Only generates the file but does not add it to the project.
+      /// </summary>
+      GenerateOnly,
 
-    /// <summary>
-    /// Adds the file to the project and does not set a build action.
-    /// </summary>
-    None,
+      /// <summary>
+      /// Adds the file to the project and does not set a build action.
+      /// </summary>
+      None,
 
-    /// <summary>
-    /// Adds the file to the project and sets the compile build action.
-    /// </summary>
-    Compile,
+      /// <summary>
+      /// Adds the file to the project and sets the compile build action.
+      /// </summary>
+      Compile,
 
-    /// <summary>
-    /// Adds the file to the project and sets the content build action.
-    /// </summary>
-    Content,
+      /// <summary>
+      /// Adds the file to the project and sets the content build action.
+      /// </summary>
+      Content,
 
-    /// <summary>
-    /// Adds the file to the project and sets the embedded resource build action.
-    /// </summary>
-    EmbeddedResource
-}
-```
+      /// <summary>
+      /// Adds the file to the project and sets the embedded resource build action.
+      /// </summary>
+      EmbeddedResource
+    }
+    ```
 
-For example, to set the build action for the default generated file and an alternate generated file you would write:
+    For example, to set the build action for the default generated file and an alternate generated file you would write:
 
-```
-Output.BuildAction = BuildAction.None;
-Output["embedded.xml"].BuildAction = BuildAction.EmbeddedResource;
-```
+    ```
+    Output.BuildAction = BuildAction.None;
+    Output["embedded.xml"].BuildAction = BuildAction.EmbeddedResource;
+    ```
 
 # Libraries
 
