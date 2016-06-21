@@ -39,6 +39,16 @@ namespace Scripty.Core
             //}
         }
 
+        public ScriptContext GetContext(string scriptFilePath)
+        {
+            if (scriptFilePath == null)
+            {
+                throw new ArgumentNullException(nameof(scriptFilePath));
+            }
+
+            return new ScriptContext(scriptFilePath, _projectFilePath, _projectRoot);
+        }
+
         public async Task<ScriptResult> Evaluate(ScriptSource source)
         {
             ScriptOptions options = ScriptOptions.Default
@@ -54,7 +64,7 @@ namespace Scripty.Core
                     "Scripty.Core.Output",
                     "Scripty.Core.ProjectTree");
 
-            using (ScriptContext context = new ScriptContext(source.FilePath, _projectFilePath, _projectRoot))
+            using (ScriptContext context = GetContext(source.FilePath))
             {
                 try
                 {

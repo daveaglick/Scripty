@@ -37,7 +37,7 @@ namespace Scripty.Core.ProjectTree
 
                 List<string> folders = new List<string>();
                 ProjectNode folderNode = Parent;
-                while (folderNode != null)
+                while (folderNode != null && folderNode != _projectRoot)
                 {
                     folders.Add(folderNode.Name);
                     folderNode = folderNode.Parent;

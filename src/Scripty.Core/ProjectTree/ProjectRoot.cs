@@ -96,7 +96,7 @@ namespace Scripty.Core.ProjectTree
                     }
                     _generatedTree = true;
                 }
-                return Children;
+                return base.Children;
             }
         }
     }
