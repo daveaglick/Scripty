@@ -12,6 +12,7 @@ namespace Scripty.Core.Output
         private readonly string _scriptFilePath;
         private readonly Dictionary<string, OutputFileWriter> _outputFiles
             = new Dictionary<string, OutputFileWriter>();
+        private string _filePath;
 
         private bool _disposed;
 
@@ -27,7 +28,7 @@ namespace Scripty.Core.Output
             }
 
             _scriptFilePath = scriptFilePath;
-            FilePath = Path.ChangeExtension(scriptFilePath, ".cs");
+            _filePath = Path.ChangeExtension(scriptFilePath, ".cs");
         }
 
         protected override void Dispose(bool disposing)
@@ -71,7 +72,27 @@ namespace Scripty.Core.Output
 
         internal ICollection<IOutputFileInfo> OutputFiles => _outputFiles.Values.Cast<IOutputFileInfo>().ToList();
 
-        public override string FilePath { get; }
+        public override string FilePath => _filePath;
+
+        public void SetFilePath(string filePath)
+        {
+            if (filePath == null)
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            _filePath = filePath;
+        }
+
+        public void SetExtension(string extension)
+        {
+            if (extension == null)
+            {
+                throw new ArgumentNullException(nameof(extension));
+            }
+
+            _filePath = Path.ChangeExtension(_scriptFilePath, extension);
+        }
 
         public override BuildAction BuildAction
         {

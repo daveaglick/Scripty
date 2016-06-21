@@ -136,6 +136,18 @@ The following global properties are available when evaluating your script with S
   Output["other.cs"].WriteLine("// Another file");
   ```
 
+  * `FilePath`
+
+    Gets the currently set file path for the output file.
+
+  * `SetFilePath(string filePath)`
+
+    Changes the file path for the main output file.
+
+  * `SetExtension(string extension)`
+
+    Sets the file path for the main output file to the same path as the script with the specified extension. Note that if an alternate file path is specified using `SetFilePath()`, this method will ignore that and will base the new file path on the script file path.
+
   * `BuildAction`
 
     You can also control the build action for the generated file using the `BuildAction` property. By default, any output file that ends in `.cs` is compiled and all others are included in the project but not compiled (I.e., a build action of "None"). The `BuildAction` property takes the following enum:

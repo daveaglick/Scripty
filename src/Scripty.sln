@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty", "Scripty\Scripty.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.CustomTool", "Scripty.CustomTool\Scripty.CustomTool.csproj", "{B2562827-CABF-4E23-8E91-3E5563BE44A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.Core.Tests", "Scripty.Core.Tests\Scripty.Core.Tests.csproj", "{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{B2562827-CABF-4E23-8E91-3E5563BE44A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2562827-CABF-4E23-8E91-3E5563BE44A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2562827-CABF-4E23-8E91-3E5563BE44A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
