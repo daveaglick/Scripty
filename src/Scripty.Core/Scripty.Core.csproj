@@ -148,6 +148,8 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Output\BuildAction.cs" />
+    <Compile Include="Output\IIndention.cs" />
+    <Compile Include="Output\Indention.cs" />
     <Compile Include="Output\IOutputFileInfo.cs" />
     <Compile Include="Output\OutputFile.cs" />
     <Compile Include="Output\OutputFileCollection.cs" />
