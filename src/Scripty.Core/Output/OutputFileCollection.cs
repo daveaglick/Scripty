@@ -214,11 +214,37 @@ namespace Scripty.Core.Output
             set { DefaultOutput.NewLine = value; }
         }
 
+        public override int IndentLevel => DefaultOutput.IndentLevel;
+
+        public override string IndentString
+        {
+            get { return DefaultOutput.IndentString; }
+            set { DefaultOutput.IndentString = value; }
+        }
+
+        public override bool IndentEnabled
+        {
+            get { return DefaultOutput.IndentEnabled; }
+            set { DefaultOutput.IndentEnabled = value; }
+        }
+
         public override OutputFile SetNewLine(string newLine)
         {
             var defaultOutput = DefaultOutput;
             defaultOutput.NewLine = newLine;
             return defaultOutput;
         }
+
+        public override OutputFile Dedent() => DefaultOutput.Dedent();
+
+        public override OutputFile SetIndentString(string indentString) => DefaultOutput.SetIndentString(indentString);
+
+        public override OutputFile SetIndentEnabled(bool indentEnabled) => DefaultOutput.SetIndentEnabled(indentEnabled);
+
+        public override IndentScope Indent() => DefaultOutput.Indent();
+
+        public override IndentScope Indent(int count) => DefaultOutput.Indent(count);
+
+        public override IndentScope Indent(string indentString) => DefaultOutput.Indent(indentString);
     }
 }

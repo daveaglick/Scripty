@@ -80,6 +80,12 @@ namespace Scripty.Core.Output
 
         public abstract OutputFile SetNewLine(string newLine);
 
+        public abstract OutputFile Dedent();
+
+        public abstract OutputFile SetIndentString(string indentString);
+
+        public abstract OutputFile SetIndentEnabled(bool indentEnabled);
+
         protected sealed override void InternalClose()
         {
             Close();
