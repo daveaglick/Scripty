@@ -13,8 +13,11 @@ namespace Scripty.Core.Output
         private readonly Dictionary<string, OutputFileWriter> _outputFiles
             = new Dictionary<string, OutputFileWriter>();
         private string _filePath;
+        private OutputFile _defaultOutput;
 
         private bool _disposed;
+
+        private OutputFile DefaultOutput => _defaultOutput ?? (_defaultOutput = this[FilePath]);
 
         internal OutputFileCollection(string scriptFilePath)
         {
@@ -74,7 +77,7 @@ namespace Scripty.Core.Output
 
         public override string FilePath => _filePath;
 
-        public void SetFilePath(string filePath)
+        public OutputFileCollection SetFilePath(string filePath)
         {
             if (filePath == null)
             {
@@ -82,9 +85,11 @@ namespace Scripty.Core.Output
             }
 
             _filePath = filePath;
+            _defaultOutput = null;
+            return this;
         }
 
-        public void SetExtension(string extension)
+        public OutputFileCollection SetExtension(string extension)
         {
             if (extension == null)
             {
@@ -92,112 +97,128 @@ namespace Scripty.Core.Output
             }
 
             _filePath = Path.ChangeExtension(_scriptFilePath, extension);
+            _defaultOutput = null;
+            return this;
         }
 
         public override BuildAction BuildAction
         {
-            get { return this[FilePath].BuildAction; }
-            set { this[FilePath].BuildAction = value; }
+            get { return DefaultOutput.BuildAction; }
+            set { DefaultOutput.BuildAction = value; }
         }
 
-        public override void Close() => this[FilePath].Close();
+        public override OutputFile SetBuildAction(BuildAction buildAction)
+        {
+            var defaultOutput = DefaultOutput;
+            defaultOutput.BuildAction = buildAction;
+            return defaultOutput;
+        }
 
-        public override void Flush() => this[FilePath].Flush();
+        public override OutputFile Close() => DefaultOutput.Close();
 
-        public override void Write(char value) => this[FilePath].Write(value);
+        public override OutputFile Flush() => DefaultOutput.Flush();
 
-        public override void Write(char[] buffer) => this[FilePath].Write(buffer);
+        public override OutputFile Write(char value) => DefaultOutput.Write(value);
 
-        public override void Write(char[] buffer, int index, int count) => this[FilePath].Write(buffer, index, count);
+        public override OutputFile Write(char[] buffer) => DefaultOutput.Write(buffer);
 
-        public override void Write(bool value) => this[FilePath].Write(value);
+        public override OutputFile Write(char[] buffer, int index, int count) => DefaultOutput.Write(buffer, index, count);
 
-        public override void Write(int value) => this[FilePath].Write(value);
+        public override OutputFile Write(bool value) => DefaultOutput.Write(value);
 
-        public override void Write(uint value) => this[FilePath].Write(value);
+        public override OutputFile Write(int value) => DefaultOutput.Write(value);
 
-        public override void Write(long value) => this[FilePath].Write(value);
+        public override OutputFile Write(uint value) => DefaultOutput.Write(value);
 
-        public override void Write(ulong value) => this[FilePath].Write(value);
+        public override OutputFile Write(long value) => DefaultOutput.Write(value);
 
-        public override void Write(float value) => this[FilePath].Write(value);
+        public override OutputFile Write(ulong value) => DefaultOutput.Write(value);
 
-        public override void Write(double value) => this[FilePath].Write(value);
+        public override OutputFile Write(float value) => DefaultOutput.Write(value);
 
-        public override void Write(decimal value) => this[FilePath].Write(value);
+        public override OutputFile Write(double value) => DefaultOutput.Write(value);
 
-        public override void Write(string value) => this[FilePath].Write(value);
+        public override OutputFile Write(decimal value) => DefaultOutput.Write(value);
 
-        public override void Write(object value) => this[FilePath].Write(value);
+        public override OutputFile Write(string value) => DefaultOutput.Write(value);
 
-        public override void Write(string format, object arg0) => this[FilePath].Write(format, arg0);
+        public override OutputFile Write(object value) => DefaultOutput.Write(value);
 
-        public override void Write(string format, object arg0, object arg1) => this[FilePath].Write(format, arg0, arg1);
+        public override OutputFile Write(string format, object arg0) => DefaultOutput.Write(format, arg0);
 
-        public override void Write(string format, object arg0, object arg1, object arg2) => this[FilePath].Write(format, arg0, arg1, arg2);
+        public override OutputFile Write(string format, object arg0, object arg1) => DefaultOutput.Write(format, arg0, arg1);
 
-        public override void Write(string format, params object[] arg) => this[FilePath].Write(format, arg);
+        public override OutputFile Write(string format, object arg0, object arg1, object arg2) => DefaultOutput.Write(format, arg0, arg1, arg2);
 
-        public override void WriteLine() => this[FilePath].WriteLine();
+        public override OutputFile Write(string format, params object[] arg) => DefaultOutput.Write(format, arg);
 
-        public override void WriteLine(char value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine() => DefaultOutput.WriteLine();
 
-        public override void WriteLine(char[] buffer) => this[FilePath].WriteLine(buffer);
+        public override OutputFile WriteLine(char value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(char[] buffer, int index, int count) => this[FilePath].WriteLine(buffer, index, count);
+        public override OutputFile WriteLine(char[] buffer) => DefaultOutput.WriteLine(buffer);
 
-        public override void WriteLine(bool value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(char[] buffer, int index, int count) => DefaultOutput.WriteLine(buffer, index, count);
 
-        public override void WriteLine(int value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(bool value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(uint value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(int value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(long value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(uint value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(ulong value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(long value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(float value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(ulong value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(double value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(float value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(decimal value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(double value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(string value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(decimal value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(object value) => this[FilePath].WriteLine(value);
+        public override OutputFile WriteLine(string value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(string format, object arg0) => this[FilePath].WriteLine(format, arg0);
+        public override OutputFile WriteLine(object value) => DefaultOutput.WriteLine(value);
 
-        public override void WriteLine(string format, object arg0, object arg1) => this[FilePath].WriteLine(format, arg0, arg1);
+        public override OutputFile WriteLine(string format, object arg0) => DefaultOutput.WriteLine(format, arg0);
 
-        public override void WriteLine(string format, object arg0, object arg1, object arg2) => this[FilePath].WriteLine(format, arg0, arg1, arg2);
+        public override OutputFile WriteLine(string format, object arg0, object arg1) => DefaultOutput.WriteLine(format, arg0, arg1);
 
-        public override void WriteLine(string format, params object[] arg) => this[FilePath].WriteLine(format, arg);
+        public override OutputFile WriteLine(string format, object arg0, object arg1, object arg2) => DefaultOutput.WriteLine(format, arg0, arg1, arg2);
 
-        public override Task WriteAsync(char value) => this[FilePath].WriteAsync(value);
+        public override OutputFile WriteLine(string format, params object[] arg) => DefaultOutput.WriteLine(format, arg);
 
-        public override Task WriteAsync(string value) => this[FilePath].WriteAsync(value);
+        public override Task WriteAsync(char value) => DefaultOutput.WriteAsync(value);
 
-        public override Task WriteAsync(char[] buffer, int index, int count) => this[FilePath].WriteAsync(buffer, index, count);
+        public override Task WriteAsync(string value) => DefaultOutput.WriteAsync(value);
 
-        public override Task WriteLineAsync(char value) => this[FilePath].WriteLineAsync(value);
+        public override Task WriteAsync(char[] buffer, int index, int count) => DefaultOutput.WriteAsync(buffer, index, count);
 
-        public override Task WriteLineAsync(string value) => this[FilePath].WriteLineAsync(value);
+        public override Task WriteLineAsync(char value) => DefaultOutput.WriteLineAsync(value);
 
-        public override Task WriteLineAsync(char[] buffer, int index, int count) => this[FilePath].WriteLineAsync(buffer, index, count);
+        public override Task WriteLineAsync(string value) => DefaultOutput.WriteLineAsync(value);
 
-        public override Task WriteLineAsync() => this[FilePath].WriteLineAsync();
+        public override Task WriteLineAsync(char[] buffer, int index, int count) => DefaultOutput.WriteLineAsync(buffer, index, count);
 
-        public override Task FlushAsync() => this[FilePath].FlushAsync();
+        public override Task WriteLineAsync() => DefaultOutput.WriteLineAsync();
 
-        public override IFormatProvider FormatProvider => this[FilePath].FormatProvider;
+        public override Task FlushAsync() => DefaultOutput.FlushAsync();
 
-        public override Encoding Encoding => this[FilePath].Encoding;
+        public override IFormatProvider FormatProvider => DefaultOutput.FormatProvider;
+
+        public override Encoding Encoding => DefaultOutput.Encoding;
 
         public override string NewLine
         {
-            get { return this[FilePath].NewLine; }
-            set { this[FilePath].NewLine = value; }
+            get { return DefaultOutput.NewLine; }
+            set { DefaultOutput.NewLine = value; }
+        }
+
+        public override OutputFile SetNewLine(string newLine)
+        {
+            var defaultOutput = DefaultOutput;
+            defaultOutput.NewLine = newLine;
+            return defaultOutput;
         }
     }
 }
