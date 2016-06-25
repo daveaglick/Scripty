@@ -8,9 +8,21 @@ namespace Scripty.Core.Output
 
         public abstract BuildAction BuildAction { get; set; }
 
+        public abstract int IndentLevel { get; }
+
+        public abstract string IndentString { get; set; }
+
+        public abstract bool IndentEnabled { get; set; }
+
         internal OutputFileBase()
         {
         }
+
+        public abstract IndentScope Indent();
+
+        public abstract IndentScope Indent(int count);
+
+        public abstract IndentScope Indent(string indentString);
 
         public sealed override void Close() => InternalClose();
 
