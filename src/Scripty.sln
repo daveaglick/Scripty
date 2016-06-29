@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.CustomTool", "Scrip
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.Core.Tests", "Scripty.Core.Tests\Scripty.Core.Tests.csproj", "{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty", "Cake.Scripty\Cake.Scripty.csproj", "{D7369930-CDB9-4BE8-B609-6E242D980251}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty.Tests", "Cake.Scripty.Tests\Cake.Scripty.Tests.csproj", "{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E9CCC68-0B5D-4771-A72C-943BE64E32E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7369930-CDB9-4BE8-B609-6E242D980251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7369930-CDB9-4BE8-B609-6E242D980251}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7369930-CDB9-4BE8-B609-6E242D980251}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7369930-CDB9-4BE8-B609-6E242D980251}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -117,7 +117,7 @@ Task("Create-Library-Packages")
     .Does(() =>
     {        
         // Get the set of nuspecs to package
-        List<FilePath> nuspecs = new List<FilePath>(GetFiles("./src/Scripty.*/*.nuspec"));
+        List<FilePath> nuspecs = new List<FilePath>(GetFiles("./src/Scripty.*/*.nuspec") + GetFiles("./src/*.Scripty/*.nuspec"));
         
         // Package all nuspecs
         foreach (var nuspec in nuspecs)
