@@ -1,6 +1,6 @@
 Tools to let you use Roslyn-powered C# scripts for code generation. You can think of it as a scripted alternative to T4 templates.
 
-**Note that this document cooresponds to the currently active source code branch, which may be in development. To vew documentation for the latest *release* of Scripty make sure you are viewing the `master` branch.**
+**Note that this document cooresponds to the currently active source code branch, which may be in development. To view documentation for the latest *release* of Scripty make sure you are viewing the `master` branch.**
 
 # Quick Start
 
