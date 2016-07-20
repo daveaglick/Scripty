@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cake.Core.IO;
+using Cake.Testing.Fixtures;
 using NUnit.Framework;
 
 namespace Cake.Scripty.Tests
@@ -14,43 +16,62 @@ namespace Cake.Scripty.Tests
         [Test]
         public void ShouldThrowOnNullProjectPath()
         {
-            var fixture = new ScriptyFixture(r => r.Evaluate()) {ProjectFilePath = null};
+            // Given
+            ScriptyFixture fixture = new ScriptyFixture(r => r.Evaluate()) {ProjectFilePath = null};
 
+            // When, Then
             Assert.Throws<ArgumentNullException>(() => fixture.Run());
         }
 
         [Test]
         public void ShouldThrowWhenNoFilesProvided()
         {
-            var fixture = new ScriptyFixture(r => r.Evaluate());
+            // Given
+            ScriptyFixture fixture = new ScriptyFixture(r => r.Evaluate());
 
+            // When, Then
             Assert.Throws<ArgumentException>(() => fixture.Run());
         }
 
         [Test]
         public void ShouldAddProjectFile()
         {
-            var fixture = new ScriptyFixture(r => r.Evaluate("file.csx"));
-            var result = fixture.Run();
-            var proj = fixture.GetProjectFilePath();
+            // Given
+            ScriptyFixture fixture = new ScriptyFixture(r => r.Evaluate("file.csx"));
+
+            // When
+            ToolFixtureResult result = fixture.Run();
+
+            // Then
+            FilePath proj = fixture.GetProjectFilePath();
             Assert.True(result.Args.StartsWith($"\"{proj}\""));
         }
 
         [Test]
         public void ShouldAddSingleScriptFile()
         {
-            var fixture = new ScriptyFixture(r => r.Evaluate("file.csx"));
-            var result = fixture.Run();
-            var proj = fixture.GetProjectFilePath();
+            // Given
+            ScriptyFixture fixture = new ScriptyFixture(r => r.Evaluate("file.csx"));
+
+            // When
+            ToolFixtureResult result = fixture.Run();
+
+            // Then
+            FilePath proj = fixture.GetProjectFilePath();
             Assert.True(result.Args == $"\"{proj}\" \"file.csx\"");
         }
 
         [Test]
         public void ShouldAddMultipleFiles()
         {
-            var fixture = new ScriptyFixture(r => r.Evaluate("file.csx", "script.csx"));
-            var result = fixture.Run();
-            var proj = fixture.GetProjectFilePath();
+            // Given
+            ScriptyFixture fixture = new ScriptyFixture(r => r.Evaluate("file.csx", "script.csx"));
+
+            // When
+            ToolFixtureResult result = fixture.Run();
+
+            // Then
+            FilePath proj = fixture.GetProjectFilePath();
             Assert.True(result.Args == $"\"{proj}\" \"file.csx\" \"script.csx\"");
         }
     }

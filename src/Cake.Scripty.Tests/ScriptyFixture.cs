@@ -10,7 +10,6 @@ namespace Cake.Scripty.Tests
 {
     class ScriptyFixture : ToolFixture<ScriptySettings>
     {
-
         public ScriptyFixture() : base("scripty.exe")
         {
         }
