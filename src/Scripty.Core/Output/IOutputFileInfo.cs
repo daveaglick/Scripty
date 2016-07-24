@@ -1,8 +1,12 @@
+using Microsoft.CodeAnalysis.Options;
+
 namespace Scripty.Core.Output
 {
     public interface IOutputFileInfo
     {
-        string FilePath { get; }    
+        string FilePath { get; }
         BuildAction BuildAction { get; }
+        bool FormatterEnabled { get; }
+        OptionSet FormatterOptions { get; }
     }
 }

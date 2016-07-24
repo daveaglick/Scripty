@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Options;
 
 namespace Scripty.Core.Output
 {
@@ -24,6 +25,10 @@ namespace Scripty.Core.Output
         public override string FilePath { get; }
 
         public override BuildAction BuildAction { get; set; }
+
+        public override bool FormatterEnabled { get; set; }
+
+        public override OptionSet FormatterOptions { get; set; }
 
         public override OutputFile Close()
         {

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.CodeAnalysis.Options;
 
 namespace Scripty.Core.Output
 {
@@ -7,6 +8,10 @@ namespace Scripty.Core.Output
         public abstract string FilePath { get; }
 
         public abstract BuildAction BuildAction { get; set; }
+
+        public abstract bool FormatterEnabled { get; set; }
+
+        public abstract OptionSet FormatterOptions { get; set; }
 
         internal OutputFileBase()
         {

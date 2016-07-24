@@ -47,6 +47,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Output\FormatterFixture.cs" />
     <Compile Include="Output\OutputFileCollectionFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -57,7 +58,25 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Output\FakeFormatter.csx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Output\FakeFormatter.NoFormat.cs.expected">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Output\FakeFormatter.Formatted.cs.expected">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Scripty.Core\bin\Debug\Microsoft.CodeAnalysis.CSharp.Workspaces.dll">
+      <Link>Microsoft.CodeAnalysis.CSharp.Workspaces.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

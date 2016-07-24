@@ -6,9 +6,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Execution;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.Text;
+using Scripty.Core.Output;
 using Scripty.Core.ProjectTree;
 
 namespace Scripty.Core
@@ -69,6 +74,23 @@ namespace Scripty.Core
                 try
                 {
                     await CSharpScript.EvaluateAsync(source.Code, options, context);
+                    foreach (var outputFile in context.Output.OutputFiles)
+                    {
+                        (outputFile as OutputFile).Close();
+
+                        if (outputFile.FormatterEnabled)
+                        {
+                            var document = _projectRoot.Analysis.AddDocument(outputFile.FilePath, File.ReadAllText(outputFile.FilePath));
+
+                            var resultDocument = await Formatter.FormatAsync(
+                                document,
+                                outputFile.FormatterOptions
+                            );
+                            var resultContent = await resultDocument.GetTextAsync();
+
+                            File.WriteAllText(outputFile.FilePath, resultContent.ToString());
+                        }
+                    }
                 }
                 catch (CompilationErrorException compilationError)
                 {
@@ -94,7 +116,7 @@ namespace Scripty.Core
                 catch (Exception ex)
                 {
                     return new ScriptResult(context.Output.OutputFiles,
-                        new []
+                        new[]
                         {
                             new ScriptError
                             {
@@ -105,6 +127,5 @@ namespace Scripty.Core
                 return new ScriptResult(context.Output.OutputFiles);
             }
         }
-
     }
 }

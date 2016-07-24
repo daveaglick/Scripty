@@ -1,0 +1,9 @@
+﻿namespace TestNamespace
+{
+class TestClass
+{
+public void TestMethod()
+{
+}
+}
+}
