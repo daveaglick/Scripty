@@ -123,6 +123,8 @@ namespace Scripty.Core.Output
 
         public override int Indent() => DefaultOutput.Indent();
 
+        public override int Indent(int indentLevel) => DefaultOutput.Indent(indentLevel);
+
         public override int IndentLevel
         {
             get { return DefaultOutput.IndentLevel; }

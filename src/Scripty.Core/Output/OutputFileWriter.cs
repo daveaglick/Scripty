@@ -40,17 +40,18 @@ namespace Scripty.Core.Output
         }
         
         public override int Indent() => IndentLevel++;
-        
+
+        public override int Indent(int indentLevel)
+        {
+            int oldIndentLevel = IndentLevel;
+            IndentLevel = indentLevel;
+            return oldIndentLevel;
+        }
+
         public override int IndentLevel
         {
             get { return _indentLevel; }
-            set
-            {
-                if (value >= 0)
-                {
-                    _indentLevel = value;
-                }
-            }
+            set { _indentLevel = value < 0 ? 0 : value; }
         }
         
         public override string IndentString { get; set; } = "    ";
@@ -62,7 +63,7 @@ namespace Scripty.Core.Output
         private void BeforeWrite()
         {
             // See if we need to indent and reset the indent flag
-            if (_indentNextWrite)
+            if (_indentNextWrite && !string.IsNullOrEmpty(IndentString))
             {
                 for (int c = 0; c < IndentLevel; c++)
                 {

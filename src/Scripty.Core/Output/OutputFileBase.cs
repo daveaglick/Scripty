@@ -20,6 +20,12 @@ namespace Scripty.Core.Output
         public abstract int Indent();
 
         /// <summary>
+        /// Sets the specified indent level.
+        /// </summary>
+        /// <returns>The previous indent level.</returns>
+        public abstract int Indent(int indentLevel);
+
+        /// <summary>
         /// Gets or sets the indent level.
         /// </summary>
         /// <value>
