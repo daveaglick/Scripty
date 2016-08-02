@@ -4,6 +4,54 @@ namespace Scripty.Core.Output
 {
     public abstract class OutputFile : OutputFileBase
     {
+        private int _indentLevel = 0;
+
+        /// <summary>
+        /// Adds another level of indentation to the output content.
+        /// </summary>
+        /// <returns>The previous indent level.</returns>
+        public int Indent() => IndentLevel++;
+
+        /// <summary>
+        /// Gets or sets the indent level.
+        /// </summary>
+        /// <value>
+        /// The indent level.
+        /// </value>
+        public int IndentLevel
+        {
+            get { return _indentLevel; }
+            set
+            {
+                if (value >= 0)
+                {
+                    _indentLevel = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the indent string. The default value is four spaces.
+        /// </summary>
+        /// <value>
+        /// The indent string.
+        /// </value>
+        public string IndentString { get; set; } = "    ";
+
+        /// <summary>
+        /// Applies an indent to the output file that will be removed when the returned
+        /// object is disposed.
+        /// </summary>
+        /// <returns>A disposable object that will reset the indent to the previous value once disposed.</returns>
+        public IDisposable WithIndent() => new Indent(this);
+
+        /// <summary>
+        /// Applies an indent with a specified indent level to the output file that will be
+        /// removed when the returned object is disposed.
+        /// </summary>
+        /// <returns>A disposable object that will reset the indent to the previous value once disposed.</returns>
+        public IDisposable WithIndent(int indentLevel) => new Indent(this, indentLevel);
+
         public abstract OutputFile SetBuildAction(BuildAction buildAction);
 
         public abstract OutputFile SetNewLine(string newLine);

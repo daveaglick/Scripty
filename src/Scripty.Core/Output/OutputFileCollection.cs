@@ -109,10 +109,35 @@ namespace Scripty.Core.Output
 
         public override OutputFile SetBuildAction(BuildAction buildAction)
         {
-            var defaultOutput = DefaultOutput;
+            OutputFile defaultOutput = DefaultOutput;
             defaultOutput.BuildAction = buildAction;
             return defaultOutput;
         }
+
+        public override OutputFile SetNewLine(string newLine)
+        {
+            OutputFile defaultOutput = DefaultOutput;
+            defaultOutput.NewLine = newLine;
+            return defaultOutput;
+        }
+
+        public override int Indent() => DefaultOutput.Indent();
+
+        public override int IndentLevel
+        {
+            get { return DefaultOutput.IndentLevel; }
+            set { DefaultOutput.IndentLevel = value; }
+        }
+
+        public override string IndentString
+        {
+            get { return DefaultOutput.IndentString; }
+            set { DefaultOutput.IndentString = value; }
+        }
+
+        public override IDisposable WithIndent() => DefaultOutput.WithIndent();
+
+        public override IDisposable WithIndent(int indentLevel) => DefaultOutput.WithIndent(indentLevel);
 
         public override OutputFile Close() => DefaultOutput.Close();
 
@@ -212,13 +237,6 @@ namespace Scripty.Core.Output
         {
             get { return DefaultOutput.NewLine; }
             set { DefaultOutput.NewLine = value; }
-        }
-
-        public override OutputFile SetNewLine(string newLine)
-        {
-            var defaultOutput = DefaultOutput;
-            defaultOutput.NewLine = newLine;
-            return defaultOutput;
         }
     }
 }

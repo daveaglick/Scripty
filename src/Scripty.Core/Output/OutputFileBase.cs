@@ -1,16 +1,53 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Scripty.Core.Output
 {
     public abstract class OutputFileBase : TextWriter, IOutputFileInfo
     {
+        internal OutputFileBase()
+        {
+        }
+
         public abstract string FilePath { get; }
 
         public abstract BuildAction BuildAction { get; set; }
 
-        internal OutputFileBase()
-        {
-        }
+        /// <summary>
+        /// Adds another level of indentation to the output content.
+        /// </summary>
+        /// <returns>The previous indent level.</returns>
+        public abstract int Indent();
+
+        /// <summary>
+        /// Gets or sets the indent level.
+        /// </summary>
+        /// <value>
+        /// The indent level.
+        /// </value>
+        public abstract int IndentLevel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the indent string. The default value is four spaces.
+        /// </summary>
+        /// <value>
+        /// The indent string.
+        /// </value>
+        public abstract string IndentString { get; set; }
+
+        /// <summary>
+        /// Applies an indent to the output file that will be removed when the returned
+        /// object is disposed.
+        /// </summary>
+        /// <returns>A disposable object that will reset the indent to the previous value once disposed.</returns>
+        public abstract IDisposable WithIndent();
+
+        /// <summary>
+        /// Applies an indent with a specified indent level to the output file that will be
+        /// removed when the returned object is disposed.
+        /// </summary>
+        /// <returns>A disposable object that will reset the indent to the previous value once disposed.</returns>
+        public abstract IDisposable WithIndent(int indentLevel);
 
         public sealed override void Close() => InternalClose();
 
