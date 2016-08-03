@@ -107,20 +107,6 @@ namespace Scripty.Core.Output
             set { DefaultOutput.BuildAction = value; }
         }
 
-        public override OutputFile SetBuildAction(BuildAction buildAction)
-        {
-            OutputFile defaultOutput = DefaultOutput;
-            defaultOutput.BuildAction = buildAction;
-            return defaultOutput;
-        }
-
-        public override OutputFile SetNewLine(string newLine)
-        {
-            OutputFile defaultOutput = DefaultOutput;
-            defaultOutput.NewLine = newLine;
-            return defaultOutput;
-        }
-
         public override int Indent() => DefaultOutput.Indent();
 
         public override int Indent(int indentLevel) => DefaultOutput.Indent(indentLevel);
@@ -141,13 +127,13 @@ namespace Scripty.Core.Output
 
         public override IDisposable WithIndent(int indentLevel) => DefaultOutput.WithIndent(indentLevel);
 
-        public override void WriteIndent() => DefaultOutput.WriteIndent();
+        public override OutputFile WriteIndent() => DefaultOutput.WriteIndent();
 
         public override Task WriteIndentAsync() => DefaultOutput.WriteIndentAsync();
 
-        public override OutputFile Close() => DefaultOutput.Close();
+        public override void Close() => DefaultOutput.Close();
 
-        public override OutputFile Flush() => DefaultOutput.Flush();
+        public override void Flush() => DefaultOutput.Flush();
 
         public override OutputFile Write(char value) => DefaultOutput.Write(value);
 

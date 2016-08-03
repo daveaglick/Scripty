@@ -10,12 +10,13 @@ namespace Scripty.Core.Output
         private readonly TextWriter _textWriter;
         private int _indentLevel = 0;
         private bool _indentNextWrite = false;  // Only indent the first write after a WriteLine() call
+        private BuildAction _buildAction;
 
         internal OutputFileWriter(string filePath)
         {
             _textWriter = new StreamWriter(filePath);
             FilePath = filePath;
-            BuildAction = Path.GetExtension(filePath) == ".cs" ? BuildAction.Compile : BuildAction.None;
+            _buildAction = Path.GetExtension(filePath) == ".cs" ? BuildAction.Compile : BuildAction.None;
         }
 
         // Used for testing
@@ -23,7 +24,7 @@ namespace Scripty.Core.Output
         {
             _textWriter = textWriter;
             FilePath = null;
-            BuildAction = BuildAction.None;
+            _buildAction = BuildAction.None;
         }
 
         protected override void Dispose(bool disposing)
@@ -33,18 +34,10 @@ namespace Scripty.Core.Output
 
         public override string FilePath { get; }
 
-        public override BuildAction BuildAction { get; set; }
-
-        public override OutputFile SetBuildAction(BuildAction buildAction)
+        public override BuildAction BuildAction
         {
-            BuildAction = buildAction;
-            return this;
-        }
-
-        public override OutputFile SetNewLine(string newLine)
-        {
-            NewLine = newLine;
-            return this;
+            get { return _buildAction; }
+            set { _buildAction = value; }
         }
         
         public override int Indent() => IndentLevel++;
@@ -68,7 +61,7 @@ namespace Scripty.Core.Output
         
         public override IDisposable WithIndent(int indentLevel) => new Indent(this, indentLevel);
 
-        public override void WriteIndent()
+        public override OutputFile WriteIndent()
         {
             if(!string.IsNullOrEmpty(IndentString))
             {
@@ -77,6 +70,7 @@ namespace Scripty.Core.Output
                     _textWriter.Write(IndentString);
                 }
             }
+            return this;
         }
 
         public override async Task WriteIndentAsync()
@@ -90,320 +84,110 @@ namespace Scripty.Core.Output
             }
         }
 
-        private void BeforeWrite()
+        private OutputFile Write(Action<TextWriter> writeAction, bool indentNextWrite)
         {
-            // See if we need to indent and reset the indent flag
             if (_indentNextWrite)
             {
                 WriteIndent();
             }
-            _indentNextWrite = false;
+            writeAction(_textWriter);
+            _indentNextWrite = indentNextWrite;
+            return this;
         }
 
-        private async Task BeforeWriteAsync()
+        private async Task WriteAsync(Func<TextWriter, Task> writeAction, bool indentNextWrite)
         {
-            // See if we need to indent and reset the indent flag
             if (_indentNextWrite)
             {
                 await WriteIndentAsync();
             }
-            _indentNextWrite = false;
+            await writeAction(_textWriter)
+                .ContinueWith(_ => _indentNextWrite = indentNextWrite);
         }
 
-        public override OutputFile Close()
-        {
-            _textWriter.Close();
-            return this;
-        }
+        public override OutputFile Write(char value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Flush()
-        {
-            _textWriter.Flush();
-            return this;
-        }
+        public override OutputFile Write(char[] buffer) => Write(x => x.Write(buffer), false);
 
-        public override OutputFile Write(char value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(char[] buffer, int index, int count) => Write(x => x.Write(buffer, index, count), false);
 
-        public override OutputFile Write(char[] buffer)
-        {
-            BeforeWrite();
-            _textWriter.Write(buffer);
-            return this;
-        }
+        public override OutputFile Write(bool value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(char[] buffer, int index, int count)
-        {
-            BeforeWrite();
-            _textWriter.Write(buffer, index, count);
-            return this;
-        }
+        public override OutputFile Write(int value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(bool value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(uint value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(int value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(long value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(uint value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(ulong value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(long value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(float value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(ulong value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(double value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(float value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(decimal value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(double value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(string value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(decimal value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(object value) => Write(x => x.Write(value), false);
 
-        public override OutputFile Write(string value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(string format, object arg0) => Write(x => x.Write(format, arg0), false);
 
-        public override OutputFile Write(object value)
-        {
-            BeforeWrite();
-            _textWriter.Write(value);
-            return this;
-        }
+        public override OutputFile Write(string format, object arg0, object arg1) => Write(x => x.Write(format, arg0, arg1), false);
 
-        public override OutputFile Write(string format, object arg0)
-        {
-            BeforeWrite();
-            _textWriter.Write(format, arg0);
-            return this;
-        }
+        public override OutputFile Write(string format, object arg0, object arg1, object arg2) => Write(x => x.Write(format, arg0, arg1, arg2), false);
 
-        public override OutputFile Write(string format, object arg0, object arg1)
-        {
-            BeforeWrite();
-            _textWriter.Write(format, arg0, arg1);
-            return this;
-        }
+        public override OutputFile Write(string format, params object[] arg) => Write(x => x.Write(format, arg), false);
 
-        public override OutputFile Write(string format, object arg0, object arg1, object arg2)
-        {
-            BeforeWrite();
-            _textWriter.Write(format, arg0, arg1, arg2);
-            return this;
-        }
+        public override OutputFile WriteLine() => Write(x => x.WriteLine(), true);
 
-        public override OutputFile Write(string format, params object[] arg)
-        {
-            BeforeWrite();
-            _textWriter.Write(format, arg);
-            return this;
-        }
+        public override OutputFile WriteLine(char value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine()
-        {
-            BeforeWrite();
-            _textWriter.WriteLine();
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(char[] buffer) => Write(x => x.WriteLine(buffer), true);
 
-        public override OutputFile WriteLine(char value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(char[] buffer, int index, int count) => Write(x => x.WriteLine(buffer, index, count), true);
 
-        public override OutputFile WriteLine(char[] buffer)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(buffer);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(bool value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(char[] buffer, int index, int count)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(buffer, index, count);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(int value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(bool value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(uint value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(int value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(long value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(uint value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(ulong value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(long value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(float value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(ulong value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(double value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(float value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(decimal value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(double value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            return this;
-        }
+        public override OutputFile WriteLine(string value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(decimal value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(object value) => Write(x => x.WriteLine(value), true);
 
-        public override OutputFile WriteLine(string value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(string format, object arg0) => Write(x => x.WriteLine(format, arg0), true);
 
-        public override OutputFile WriteLine(object value)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(value);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(string format, object arg0, object arg1) => Write(x => x.WriteLine(format, arg0, arg1), true);
 
-        public override OutputFile WriteLine(string format, object arg0)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(format, arg0);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(string format, object arg0, object arg1, object arg2) => Write(x => x.WriteLine(format, arg0, arg1, arg2), true);
 
-        public override OutputFile WriteLine(string format, object arg0, object arg1)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(format, arg0, arg1);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override OutputFile WriteLine(string format, params object[] arg) => Write(x => x.WriteLine(format, arg), true);
 
-        public override OutputFile WriteLine(string format, object arg0, object arg1, object arg2)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(format, arg0, arg1, arg2);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override Task WriteAsync(char value) => WriteAsync(x => x.WriteAsync(value), false);
 
-        public override OutputFile WriteLine(string format, params object[] arg)
-        {
-            BeforeWrite();
-            _textWriter.WriteLine(format, arg);
-            _indentNextWrite = true;
-            return this;
-        }
+        public override Task WriteAsync(string value) => WriteAsync(x => x.WriteAsync(value), false);
 
-        public override Task WriteAsync(char value) =>
-            BeforeWriteAsync().ContinueWith(antecedent => _textWriter.WriteAsync(value));
+        public override Task WriteAsync(char[] buffer, int index, int count) => WriteAsync(x => x.WriteAsync(buffer, index, count), false);
 
-        public override Task WriteAsync(string value) =>
-            BeforeWriteAsync().ContinueWith(antecedent => _textWriter.WriteAsync(value));
+        public override Task WriteLineAsync(char value) => WriteAsync(x => x.WriteLineAsync(value), true);
 
-        public override Task WriteAsync(char[] buffer, int index, int count) => 
-            BeforeWriteAsync().ContinueWith(antecedent => _textWriter.WriteAsync(buffer, index, count));
+        public override Task WriteLineAsync(string value) => WriteAsync(x => x.WriteLineAsync(value), true);
 
-        public override Task WriteLineAsync(char value) => 
-            _textWriter.WriteLineAsync(value).ContinueWith(antecedent => _indentNextWrite = true);
+        public override Task WriteLineAsync(char[] buffer, int index, int count) => WriteAsync(x => x.WriteLineAsync(buffer, index, count), true);
 
-        public override Task WriteLineAsync(string value) => 
-            _textWriter.WriteLineAsync(value).ContinueWith(antecedent => _indentNextWrite = true);
-
-        public override Task WriteLineAsync(char[] buffer, int index, int count) => 
-            _textWriter.WriteLineAsync(buffer, index, count).ContinueWith(antecedent => _indentNextWrite = true);
-
-        public override Task WriteLineAsync() => 
-            _textWriter.WriteLineAsync().ContinueWith(antecedent => _indentNextWrite = true);
+        public override Task WriteLineAsync() => WriteAsync(x => x.WriteLineAsync(), true);
 
         public override Task FlushAsync() => _textWriter.FlushAsync();
 
@@ -416,5 +200,9 @@ namespace Scripty.Core.Output
             get { return _textWriter.NewLine; }
             set { _textWriter.NewLine = value; }
         }
+
+        public override void Close() => _textWriter.Close();
+
+        public override void Flush() => _textWriter.Flush();
     }
 }
