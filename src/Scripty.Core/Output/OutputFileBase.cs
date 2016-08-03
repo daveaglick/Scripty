@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Scripty.Core.Output
 {
@@ -54,6 +55,16 @@ namespace Scripty.Core.Output
         /// </summary>
         /// <returns>A disposable object that will reset the indent to the previous value once disposed.</returns>
         public abstract IDisposable WithIndent(int indentLevel);
+
+        /// <summary>
+        /// Writes the indent string a number of times equal to the indent level .
+        /// </summary>
+        public abstract void WriteIndent();
+
+        /// <summary>
+        /// Writes the indent string a number of times equal to the indent level .
+        /// </summary>
+        public abstract Task WriteIndentAsync();
 
         public sealed override void Close() => InternalClose();
 

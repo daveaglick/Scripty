@@ -47,7 +47,9 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="BaseFixture.cs" />
     <Compile Include="Output\OutputFileCollectionFixture.cs" />
+    <Compile Include="Output\OutputFileWriterFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

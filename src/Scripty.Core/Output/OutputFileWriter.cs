@@ -7,20 +7,28 @@ namespace Scripty.Core.Output
 {
     internal class OutputFileWriter : OutputFile
     {
-        private readonly StreamWriter _streamWriter;
+        private readonly TextWriter _textWriter;
         private int _indentLevel = 0;
         private bool _indentNextWrite = false;  // Only indent the first write after a WriteLine() call
 
         internal OutputFileWriter(string filePath)
         {
-            _streamWriter = new StreamWriter(filePath);
+            _textWriter = new StreamWriter(filePath);
             FilePath = filePath;
             BuildAction = Path.GetExtension(filePath) == ".cs" ? BuildAction.Compile : BuildAction.None;
         }
 
+        // Used for testing
+        internal OutputFileWriter(TextWriter textWriter)
+        {
+            _textWriter = textWriter;
+            FilePath = null;
+            BuildAction = BuildAction.None;
+        }
+
         protected override void Dispose(bool disposing)
         {
-            _streamWriter.Dispose();
+            _textWriter.Dispose();
         }
 
         public override string FilePath { get; }
@@ -60,15 +68,34 @@ namespace Scripty.Core.Output
         
         public override IDisposable WithIndent(int indentLevel) => new Indent(this, indentLevel);
 
-        private void BeforeWrite()
+        public override void WriteIndent()
         {
-            // See if we need to indent and reset the indent flag
-            if (_indentNextWrite && !string.IsNullOrEmpty(IndentString))
+            if(!string.IsNullOrEmpty(IndentString))
             {
                 for (int c = 0; c < IndentLevel; c++)
                 {
-                    Write(IndentString);
+                    _textWriter.Write(IndentString);
                 }
+            }
+        }
+
+        public override async Task WriteIndentAsync()
+        {
+            if (!string.IsNullOrEmpty(IndentString))
+            {
+                for (int c = 0; c < IndentLevel; c++)
+                {
+                    await _textWriter.WriteAsync(IndentString);
+                }
+            }
+        }
+
+        private void BeforeWrite()
+        {
+            // See if we need to indent and reset the indent flag
+            if (_indentNextWrite)
+            {
+                WriteIndent();
             }
             _indentNextWrite = false;
         }
@@ -78,149 +105,146 @@ namespace Scripty.Core.Output
             // See if we need to indent and reset the indent flag
             if (_indentNextWrite)
             {
-                for (int c = 0; c < IndentLevel; c++)
-                {
-                    await WriteAsync(IndentString);
-                }
+                await WriteIndentAsync();
             }
             _indentNextWrite = false;
         }
 
         public override OutputFile Close()
         {
-            _streamWriter.Close();
+            _textWriter.Close();
             return this;
         }
 
         public override OutputFile Flush()
         {
-            _streamWriter.Flush();
+            _textWriter.Flush();
             return this;
         }
 
         public override OutputFile Write(char value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(char[] buffer)
         {
             BeforeWrite();
-            _streamWriter.Write(buffer);
+            _textWriter.Write(buffer);
             return this;
         }
 
         public override OutputFile Write(char[] buffer, int index, int count)
         {
             BeforeWrite();
-            _streamWriter.Write(buffer, index, count);
+            _textWriter.Write(buffer, index, count);
             return this;
         }
 
         public override OutputFile Write(bool value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(int value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(uint value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(long value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(ulong value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(float value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(double value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(decimal value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(string value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(object value)
         {
             BeforeWrite();
-            _streamWriter.Write(value);
+            _textWriter.Write(value);
             return this;
         }
 
         public override OutputFile Write(string format, object arg0)
         {
             BeforeWrite();
-            _streamWriter.Write(format, arg0);
+            _textWriter.Write(format, arg0);
             return this;
         }
 
         public override OutputFile Write(string format, object arg0, object arg1)
         {
             BeforeWrite();
-            _streamWriter.Write(format, arg0, arg1);
+            _textWriter.Write(format, arg0, arg1);
             return this;
         }
 
         public override OutputFile Write(string format, object arg0, object arg1, object arg2)
         {
             BeforeWrite();
-            _streamWriter.Write(format, arg0, arg1, arg2);
+            _textWriter.Write(format, arg0, arg1, arg2);
             return this;
         }
 
         public override OutputFile Write(string format, params object[] arg)
         {
             BeforeWrite();
-            _streamWriter.Write(format, arg);
+            _textWriter.Write(format, arg);
             return this;
         }
 
         public override OutputFile WriteLine()
         {
             BeforeWrite();
-            _streamWriter.WriteLine();
+            _textWriter.WriteLine();
             _indentNextWrite = true;
             return this;
         }
@@ -228,7 +252,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(char value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -236,7 +260,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(char[] buffer)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(buffer);
+            _textWriter.WriteLine(buffer);
             _indentNextWrite = true;
             return this;
         }
@@ -244,7 +268,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(char[] buffer, int index, int count)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(buffer, index, count);
+            _textWriter.WriteLine(buffer, index, count);
             _indentNextWrite = true;
             return this;
         }
@@ -252,7 +276,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(bool value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -260,7 +284,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(int value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -268,7 +292,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(uint value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -276,7 +300,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(long value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -284,7 +308,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(ulong value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -292,7 +316,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(float value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -300,14 +324,14 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(double value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             return this;
         }
 
         public override OutputFile WriteLine(decimal value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -315,7 +339,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(string value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -323,7 +347,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(object value)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(value);
+            _textWriter.WriteLine(value);
             _indentNextWrite = true;
             return this;
         }
@@ -331,7 +355,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(string format, object arg0)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(format, arg0);
+            _textWriter.WriteLine(format, arg0);
             _indentNextWrite = true;
             return this;
         }
@@ -339,7 +363,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(string format, object arg0, object arg1)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(format, arg0, arg1);
+            _textWriter.WriteLine(format, arg0, arg1);
             _indentNextWrite = true;
             return this;
         }
@@ -347,7 +371,7 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(string format, object arg0, object arg1, object arg2)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(format, arg0, arg1, arg2);
+            _textWriter.WriteLine(format, arg0, arg1, arg2);
             _indentNextWrite = true;
             return this;
         }
@@ -355,42 +379,42 @@ namespace Scripty.Core.Output
         public override OutputFile WriteLine(string format, params object[] arg)
         {
             BeforeWrite();
-            _streamWriter.WriteLine(format, arg);
+            _textWriter.WriteLine(format, arg);
             _indentNextWrite = true;
             return this;
         }
 
         public override Task WriteAsync(char value) =>
-            BeforeWriteAsync().ContinueWith(antecedent => _streamWriter.WriteAsync(value));
+            BeforeWriteAsync().ContinueWith(antecedent => _textWriter.WriteAsync(value));
 
         public override Task WriteAsync(string value) =>
-            BeforeWriteAsync().ContinueWith(antecedent => _streamWriter.WriteAsync(value));
+            BeforeWriteAsync().ContinueWith(antecedent => _textWriter.WriteAsync(value));
 
         public override Task WriteAsync(char[] buffer, int index, int count) => 
-            BeforeWriteAsync().ContinueWith(antecedent => _streamWriter.WriteAsync(buffer, index, count));
+            BeforeWriteAsync().ContinueWith(antecedent => _textWriter.WriteAsync(buffer, index, count));
 
         public override Task WriteLineAsync(char value) => 
-            _streamWriter.WriteLineAsync(value).ContinueWith(antecedent => _indentNextWrite = true);
+            _textWriter.WriteLineAsync(value).ContinueWith(antecedent => _indentNextWrite = true);
 
         public override Task WriteLineAsync(string value) => 
-            _streamWriter.WriteLineAsync(value).ContinueWith(antecedent => _indentNextWrite = true);
+            _textWriter.WriteLineAsync(value).ContinueWith(antecedent => _indentNextWrite = true);
 
         public override Task WriteLineAsync(char[] buffer, int index, int count) => 
-            _streamWriter.WriteLineAsync(buffer, index, count).ContinueWith(antecedent => _indentNextWrite = true);
+            _textWriter.WriteLineAsync(buffer, index, count).ContinueWith(antecedent => _indentNextWrite = true);
 
         public override Task WriteLineAsync() => 
-            _streamWriter.WriteLineAsync().ContinueWith(antecedent => _indentNextWrite = true);
+            _textWriter.WriteLineAsync().ContinueWith(antecedent => _indentNextWrite = true);
 
-        public override Task FlushAsync() => _streamWriter.FlushAsync();
+        public override Task FlushAsync() => _textWriter.FlushAsync();
 
-        public override IFormatProvider FormatProvider => _streamWriter.FormatProvider;
+        public override IFormatProvider FormatProvider => _textWriter.FormatProvider;
 
-        public override Encoding Encoding => _streamWriter.Encoding;
+        public override Encoding Encoding => _textWriter.Encoding;
 
         public override string NewLine
         {
-            get { return _streamWriter.NewLine; }
-            set { _streamWriter.NewLine = value; }
+            get { return _textWriter.NewLine; }
+            set { _textWriter.NewLine = value; }
         }
     }
 }

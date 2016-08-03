@@ -141,6 +141,10 @@ namespace Scripty.Core.Output
 
         public override IDisposable WithIndent(int indentLevel) => DefaultOutput.WithIndent(indentLevel);
 
+        public override void WriteIndent() => DefaultOutput.WriteIndent();
+
+        public override Task WriteIndentAsync() => DefaultOutput.WriteIndentAsync();
+
         public override OutputFile Close() => DefaultOutput.Close();
 
         public override OutputFile Flush() => DefaultOutput.Flush();
