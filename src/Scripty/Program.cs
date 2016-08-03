@@ -51,6 +51,25 @@ namespace Scripty
                 return (int)ExitCode.CommandLineError;
             }
 
+            // Attach
+            if (_settings.Attach)
+            {
+                Console.WriteLine("Waiting for a debugger to attach (or press a key to continue)...");
+                while (!Debugger.IsAttached && !Console.KeyAvailable)
+                {
+                    Thread.Sleep(100);
+                }
+                if (Console.KeyAvailable)
+                {
+                    Console.ReadKey(true);
+                    Console.WriteLine("Key pressed, continuing execution");
+                }
+                else
+                {
+                    Console.WriteLine("Debugger attached, continuing execution");
+                }
+            }
+
             // Setup all the script sources and evaluation tasks
             ScriptEngine engine = new ScriptEngine(_settings.ProjectFilePath);
             ConcurrentBag<Task<ScriptResult>> tasks = new ConcurrentBag<Task<ScriptResult>>();
