@@ -16,7 +16,6 @@ namespace Scripty.Core
     public class ScriptEngine
     {
         private readonly string _projectFilePath;
-        private readonly ProjectRoot _projectRoot;
 
         public ScriptEngine(string projectFilePath)
         {
@@ -30,24 +29,10 @@ namespace Scripty.Core
             }
 
             _projectFilePath = projectFilePath;
-            _projectRoot = new ProjectRoot(projectFilePath);
-
-            // Uncomment to pause execution while waiting for a debugger to attach
-            //while (!Debugger.IsAttached)
-            //{
-            //    Thread.Sleep(100);
-            //}
+            ProjectRoot = new ProjectRoot(projectFilePath);
         }
 
-        public ScriptContext GetContext(string scriptFilePath)
-        {
-            if (scriptFilePath == null)
-            {
-                throw new ArgumentNullException(nameof(scriptFilePath));
-            }
-
-            return new ScriptContext(scriptFilePath, _projectFilePath, _projectRoot);
-        }
+        public ProjectRoot ProjectRoot { get; }
 
         public async Task<ScriptResult> Evaluate(ScriptSource source)
         {
@@ -106,5 +91,14 @@ namespace Scripty.Core
             }
         }
 
+        private ScriptContext GetContext(string scriptFilePath)
+        {
+            if (scriptFilePath == null)
+            {
+                throw new ArgumentNullException(nameof(scriptFilePath));
+            }
+
+            return new ScriptContext(scriptFilePath, _projectFilePath, ProjectRoot);
+        }
     }
 }

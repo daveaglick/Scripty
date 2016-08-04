@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Scripty.Core;
 using Scripty.Core.Output;
+using Scripty.Core.ProjectTree;
 
 namespace Scripty
 {
@@ -70,10 +71,27 @@ namespace Scripty
                 }
             }
 
-            // Setup all the script sources and evaluation tasks
+            // Get the script engine
             ScriptEngine engine = new ScriptEngine(_settings.ProjectFilePath);
+
+            // Get script files if none were specified
+            IReadOnlyList<string> finalScriptFilePaths;
+            if (_settings.ScriptFilePaths != null && _settings.ScriptFilePaths.Count > 0)
+            {
+                finalScriptFilePaths = _settings.ScriptFilePaths;
+            }
+            else
+            {
+                // Look for any .csx files in the project
+                Console.WriteLine("No script files were specified, scanning project for .csx files");
+                List<string> scriptFilePaths = new List<string>();
+                PopulateScriptFilePaths(engine.ProjectRoot, scriptFilePaths);
+                finalScriptFilePaths = scriptFilePaths;
+            }
+            
+            // Set up tasks for the specified script files
             ConcurrentBag<Task<ScriptResult>> tasks = new ConcurrentBag<Task<ScriptResult>>();
-            Parallel.ForEach(_settings.ScriptFilePaths
+            Parallel.ForEach(finalScriptFilePaths
                 .Select(x => Path.Combine(Path.GetDirectoryName(_settings.ProjectFilePath), x))
                 .Where(x => !string.IsNullOrEmpty(x))
                 .Distinct(),
@@ -81,6 +99,7 @@ namespace Scripty
                 {
                     if (File.Exists(x))
                     {
+                        Console.WriteLine($"Adding task to evaluate {x}");
                         tasks.Add(engine.Evaluate(new ScriptSource(x, File.ReadAllText(x))));
                     }
                 });
@@ -115,6 +134,18 @@ namespace Scripty
             }
 
             return (int) ExitCode.Normal;
+        }
+
+        private void PopulateScriptFilePaths(ProjectNode node, List<string> scriptFilePaths)
+        {
+            foreach (KeyValuePair<string, ProjectNode> child in node.Children)
+            {
+                if (Path.GetExtension(child.Key) == ".csx")
+                {
+                    scriptFilePaths.Add(child.Key);
+                }
+                PopulateScriptFilePaths(child.Value, scriptFilePaths);
+            }
         }
     }
 }
