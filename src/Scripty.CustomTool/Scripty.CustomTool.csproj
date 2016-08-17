@@ -46,7 +46,7 @@
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>    
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Designer.Interfaces" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Shell.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -65,7 +65,7 @@
     <Reference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System">
       <Name>System</Name>
-    </Reference>    
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
@@ -80,6 +80,7 @@
     <Compile Include="ScriptyGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -103,7 +104,7 @@
       <Project>{52a4a907-3a42-4e65-a0c9-607a79914f61}</Project>
       <Name>Scripty.Core</Name>
     </ProjectReference>
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <VSIXSourceItem Include="..\Scripty.Core\bin\$(Configuration)\*.dll" Exclude="..\Scripty.Core\bin\$(Configuration)\Scripty.Core.dll" />
   </ItemGroup>
