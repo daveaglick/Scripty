@@ -72,7 +72,8 @@ namespace Scripty
             }
 
             // Get the script engine
-            ScriptEngine engine = new ScriptEngine(_settings.ProjectFilePath);
+            string projectFilePath = Path.Combine(Environment.CurrentDirectory, _settings.ProjectFilePath);
+            ScriptEngine engine = new ScriptEngine(projectFilePath);
 
             // Get script files if none were specified
             IReadOnlyList<string> finalScriptFilePaths;
@@ -92,7 +93,7 @@ namespace Scripty
             // Set up tasks for the specified script files
             ConcurrentBag<Task<ScriptResult>> tasks = new ConcurrentBag<Task<ScriptResult>>();
             Parallel.ForEach(finalScriptFilePaths
-                .Select(x => Path.Combine(Path.GetDirectoryName(_settings.ProjectFilePath), x))
+                .Select(x => Path.Combine(Path.GetDirectoryName(projectFilePath), x))
                 .Where(x => !string.IsNullOrEmpty(x))
                 .Distinct(),
                 x =>
