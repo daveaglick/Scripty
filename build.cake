@@ -91,6 +91,7 @@ Task("Build")
         MSBuild("./src/Scripty.sln", new MSBuildSettings()
             .SetConfiguration(configuration)
             .SetVerbosity(Verbosity.Minimal)
+            //.SetVerbosity(Verbosity.Verbose)
             .SetMSBuildPlatform(MSBuildPlatform.x86)
         );
     });
