@@ -9,6 +9,7 @@ namespace Scripty.Core.ProjectTree
     public class ProjectRoot : ProjectNode
     {
         private readonly object _projectLock = new object();
+        private MSBuildWorkspace _workspace;
         private Microsoft.CodeAnalysis.Project _analysisProject;
         private Microsoft.Build.Evaluation.Project _buildProject;
         private bool _generatedTree;
@@ -21,6 +22,21 @@ namespace Scripty.Core.ProjectTree
 
         public string FilePath { get; }
 
+        public MSBuildWorkspace Workspace
+        {
+            get
+            {
+                if (_workspace == null && !string.IsNullOrEmpty(FilePath))
+                {
+                    lock (_projectLock)
+                    {
+                        _workspace = MSBuildWorkspace.Create();
+                    }
+                }
+                return _workspace;
+            }
+        }
+
         public Microsoft.CodeAnalysis.Project Analysis
         {
             get
@@ -29,8 +45,7 @@ namespace Scripty.Core.ProjectTree
                 {
                     lock (_projectLock)
                     {
-                        MSBuildWorkspace workspace = MSBuildWorkspace.Create();
-                        _analysisProject = workspace.OpenProjectAsync(FilePath).Result;
+                        _analysisProject = Workspace.OpenProjectAsync(FilePath).Result;
                     }
                 }
                 return _analysisProject;

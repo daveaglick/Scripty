@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Options;
 
 namespace Scripty.Core.Output
 {
@@ -39,7 +40,11 @@ namespace Scripty.Core.Output
             get { return _buildAction; }
             set { _buildAction = value; }
         }
-        
+
+        public override bool FormatterEnabled { get; set; }
+
+        public override FormatterOptions FormatterOptions { get; } = new FormatterOptions();
+                
         public override int Indent() => IndentLevel++;
 
         public override int Indent(int indentLevel)
