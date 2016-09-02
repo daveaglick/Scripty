@@ -1,10 +1,16 @@
 Tools to let you use Roslyn-powered C# scripts for code generation. You can think of it as a scripted alternative to T4 templates.
 
-**Note that this document cooresponds to the currently active source code branch, which may be in development. To view documentation for the latest *release* of Scripty make sure you are viewing the `master` branch.**
+**Note that this document corresponds to the currently active source code branch, which may be in development. To view documentation for the latest *release* of Scripty make sure you are viewing the `master` branch.**
 
 # Quick Start
 
-The easiest way to get up and running is to install the [Scripty.MsBuild NuGet package](https://www.nuget.org/packages/Scripty.MsBuild/) into an existing project. Then just create a script file with a `.csx` extension, add it to your project, and watch the magic happen on your next build. Alternatively, you can install the [Scripty Visual Studio extension](https://visualstudiogallery.msdn.microsoft.com/52c02bb2-1d79-476e-82fb-5abfbfe6b3e4) to add custom tool support for code generation outside the build process.
+There are two different ways to use Scripty, and they can be used together or separately depending on your use case.
+
+The first is to use the "custom tool" functionality contained in the [Scripty Visual Studio extension](https://visualstudiogallery.msdn.microsoft.com/52c02bb2-1d79-476e-82fb-5abfbfe6b3e4). Just add that extension to Visual Studio and it's ready to go. Once the extension is installed, you have to "turn it on" for specific files. You do this by manually entering `ScriptyGenerator` as the "Custom Tool" for a file or files in the project (presumably .csx files, though it'll work for any extension). The "Custom Tool" setting can be found in the file properties in Visual Studio. Once that's set, just right-click on the file and select "Run Custom Tool". Note that the scripts *will not* be evaluated on every build automatically using this approach.
+
+The other way to use Scripty is with the MSBuild task. In this case, add the [Scripty.MsBuild NuGet package](https://www.nuget.org/packages/Scripty.MsBuild/) to your project. It will automatically pick up any .csx files in your project at build time, evaluate them, and add the results to your compilation. *You won't actually see the results in your project*. If you want the output of the scripts to show up in the project after using the MSBuild task, you'll need to manually add them after the first build.
+
+I'd recommend looking at the [Scripty Visual Studio extension](https://visualstudiogallery.msdn.microsoft.com/52c02bb2-1d79-476e-82fb-5abfbfe6b3e4) first since it's more obvious when the generation happens and you can immediately see the results. Then once you're comfortable, maybe experiment with the build task. You can also use both together to run code generation on-demand with the custom tool and also on every build with the MsBuild task. Also note that you shouldn't need to install the Roslyn SDK or manually add any of the Roslyn packages or projects to the solution. Everything is self contained in the Scripty extensions and packages.
 
 # Scripts
 
