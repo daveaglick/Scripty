@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Options;
 
 namespace Scripty.Core.Output
 {
@@ -22,7 +23,7 @@ namespace Scripty.Core.Output
         internal OutputFileCollection(string scriptFilePath)
         {
             if (string.IsNullOrEmpty(scriptFilePath))
-            { 
+            {
                 throw new ArgumentException("Value cannot be null or empty", nameof(scriptFilePath));
             }
             if (!Path.IsPathRooted(scriptFilePath))
@@ -60,7 +61,7 @@ namespace Scripty.Core.Output
                 {
                     throw new ArgumentException("Value cannot be null or empty", nameof(filePath));
                 }
-                
+
                 filePath = Path.Combine(Path.GetDirectoryName(_scriptFilePath), filePath);
                 OutputFileWriter outputFile;
                 if (!_outputFiles.TryGetValue(filePath, out outputFile))
@@ -121,6 +122,17 @@ namespace Scripty.Core.Output
         {
             get { return DefaultOutput.IndentString; }
             set { DefaultOutput.IndentString = value; }
+        }
+        
+        public override bool FormatterEnabled
+        {
+            get { return DefaultOutput.FormatterEnabled; }
+            set { DefaultOutput.FormatterEnabled = value; }
+        }
+
+        public override FormatterOptions FormatterOptions
+        {
+            get { return DefaultOutput.FormatterOptions; }
         }
 
         public override IDisposable WithIndent() => DefaultOutput.WithIndent();

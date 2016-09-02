@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Options;
 
 namespace Scripty.Core.Output
 {
@@ -12,6 +13,10 @@ namespace Scripty.Core.Output
         public abstract string FilePath { get; }
 
         public abstract BuildAction BuildAction { get; set; }
+        
+        public abstract bool FormatterEnabled { get; set; }
+
+        public abstract FormatterOptions FormatterOptions { get; }
 
         /// <summary>
         /// Adds another level of indentation to the output content.
