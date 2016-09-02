@@ -7,7 +7,7 @@
 // - Update the version in Scripty.CustomTool/source.extension.vsixmanifest
 // - Run a normal build with Cake to set SolutionInfo.cs in the repo ("build.cmd")
 // - Commit the changes to develop, switch to master, and ff merge from develop
-// - Run a Publish build with Cake ("build.cmd --target Publish")
+// - Run a Publish build with Cake ("build -target Publish")
 // - No need to add a version tag to the repo - added by GitHub on publish
 // - Manually upload the .vsix in src\artifacts to the Visual Studio Gallery
 // - Switch back to develop branch
@@ -94,6 +94,21 @@ Task("Build")
             //.SetVerbosity(Verbosity.Verbose)
             .SetMSBuildPlatform(MSBuildPlatform.x86)
         );
+    });
+
+Task("Run-Unit-Tests")
+    .IsDependentOn("Build")
+    .Does(() =>
+    {
+        var settings = new NUnit3Settings
+        {
+            Work = buildResultDir.Path.FullPath
+        };
+        if (isRunningOnAppVeyor)
+        {
+            settings.Where = "cat != ExcludeFromAppVeyor";
+        }
+        NUnit3("./src/**/bin/" + configuration + "/*.Tests.dll", settings);
     });
 
 Task("Copy-Files")
@@ -279,9 +294,10 @@ Task("Create-Packages")
 Task("Package")
     .IsDependentOn("Zip-Files")
     .IsDependentOn("Create-Packages")
-    .IsDependentOn("Test-MsBuild");
+    .IsDependentOn("Test");
     
 Task("Test")
+    .IsDependentOn("Run-Unit-Tests")
     .IsDependentOn("Test-MsBuild");
 
 Task("Default")
