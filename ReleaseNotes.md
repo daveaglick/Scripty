@@ -1,3 +1,12 @@
+# 0.5.0
+
+- [Feature] CLI now accepts relative paths to project files
+- [Feature] Adds `ScriptFiles` to the list of available build actions in Visual Studio (#45, thanks @ap0llo)
+- [Feature] CLI now scans for `.csx` files in project if none are explicitly specified (#5)
+- [Feature] Automatic indentation support (#15)
+- [Feature] Support for the Roslyn formatter to automatically format output (#47, thanks @thebigb)
+- [Feature] Implements a Cake addin for out-of-band Scripty evaluation during Cake builds (#31, thanks @agc93).
+
 # 0.4.0
 
 - [Feature][Breaking Change] New project tree abstraction (#13). If you were using the `Project` property previous to this release, you can now get to the Roslyn project object using the `Project.Analysis` property.
