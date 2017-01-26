@@ -10,21 +10,34 @@ namespace Scripty.Core.ProjectTree
     {
         private readonly object _projectLock = new object();
         private readonly string _solutionFilePath;
+        private readonly Dictionary<string, string> _properties;
         private MSBuildWorkspace _workspace;
         private Microsoft.CodeAnalysis.Project _analysisProject;
         private Microsoft.Build.Evaluation.Project _buildProject;
         private bool _generatedTree;
 
         public ProjectRoot(string filePath)
-            : this(filePath, null)
+            : this(filePath, null, null)
         {
         }
 
-        public ProjectRoot(string projectFilePath, string solutionFilePath)
+        public ProjectRoot(string projectFilePath, string solutionFilePath, IReadOnlyDictionary<string, string> properties)
             : base(null, string.Empty, null, null)
         {
             FilePath = projectFilePath;
             _solutionFilePath = solutionFilePath;
+            _properties = new Dictionary<string, string>();
+
+            // Convert the given properties from a read-only
+            // dictionary into a read-write dictionary because
+            // that is what the MSBuildWorkspace will require.
+            if (properties != null)
+            {
+                foreach (var pair in properties)
+                {
+                    _properties[pair.Key] = pair.Value;
+                }
+            }
         }
 
         public string FilePath { get; }
@@ -37,7 +50,7 @@ namespace Scripty.Core.ProjectTree
                 {
                     lock (_projectLock)
                     {
-                        _workspace = MSBuildWorkspace.Create();
+                        _workspace = MSBuildWorkspace.Create(_properties);
                     }
                 }
                 return _workspace;

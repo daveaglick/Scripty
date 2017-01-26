@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,11 +17,11 @@ namespace Scripty.Core
         private readonly string _projectFilePath;
 
         public ScriptEngine(string projectFilePath)
-            : this(projectFilePath, null)
+            : this(projectFilePath, null, null)
         {
         }
 
-        public ScriptEngine(string projectFilePath, string solutionFilePath)
+        public ScriptEngine(string projectFilePath, string solutionFilePath, IReadOnlyDictionary<string, string> properties)
         {
             if (string.IsNullOrEmpty(projectFilePath))
             {
@@ -42,7 +43,7 @@ namespace Scripty.Core
             }
 
             _projectFilePath = projectFilePath;
-            ProjectRoot = new ProjectRoot(projectFilePath, solutionFilePath);
+            ProjectRoot = new ProjectRoot(projectFilePath, solutionFilePath, properties);
         }
 
         public ProjectRoot ProjectRoot { get; }

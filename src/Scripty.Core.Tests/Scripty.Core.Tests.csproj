@@ -102,6 +102,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Output\BuildProperties.csx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Output\BuildProperties.ExcludeOptional.cs.expected">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Output\BuildProperties.IncludeOptional.cs.expected">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Output\FakeFormatter.csx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
