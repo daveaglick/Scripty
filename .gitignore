@@ -28,3 +28,5 @@ ipch
 /*.~vsd
 *UpgradeWizard*
 .vs/*
+**/TestCsx/*.cs
+**/TestCsx/*.scriptytmp

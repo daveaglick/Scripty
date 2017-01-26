@@ -84,6 +84,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Composition.AttributedModel, Version=1.0.27.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.AttributedModel.dll</HintPath>
       <Private>True</Private>
@@ -177,9 +178,11 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Enums.cs" />
     <Compile Include="Output\BuildAction.cs" />
     <Compile Include="Output\FormatterOptions.cs" />
     <Compile Include="Output\Indent.cs" />
+    <Compile Include="Output\IOutputFileWriter.cs" />
     <Compile Include="Output\IOutputFileInfo.cs" />
     <Compile Include="Output\OutputFile.cs" />
     <Compile Include="Output\OutputFileTextWriter.cs" />

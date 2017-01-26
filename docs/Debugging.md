@@ -1,8 +1,6 @@
-Because you are curious, here is 
-
 ## How to debug or modify Scripty
 
-There are at least two general paths take depending on how you need to be scripty. 
+There are at least two general paths take depending on how you need to use scripty. 
 
 #### _If you are using the Visual Studio extension_
 
