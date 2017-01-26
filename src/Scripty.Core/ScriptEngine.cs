@@ -16,6 +16,11 @@ namespace Scripty.Core
         private readonly string _projectFilePath;
 
         public ScriptEngine(string projectFilePath)
+            : this(projectFilePath, null)
+        {
+        }
+
+        public ScriptEngine(string projectFilePath, string solutionFilePath)
         {
             if (string.IsNullOrEmpty(projectFilePath))
             {
@@ -26,8 +31,18 @@ namespace Scripty.Core
                 throw new ArgumentException("Project path must be absolute", nameof(projectFilePath));
             }
 
+            // The solution path is optional. If it's provided, the solution will be loaded and 
+            // the project found in the solution. If not, then the project is loaded directly.
+            if (solutionFilePath != null)
+            {
+                if (!Path.IsPathRooted(solutionFilePath))
+                {
+                    throw new ArgumentException("Solution path must be absolute", nameof(solutionFilePath));
+                }
+            }
+
             _projectFilePath = projectFilePath;
-            ProjectRoot = new ProjectRoot(projectFilePath);
+            ProjectRoot = new ProjectRoot(projectFilePath, solutionFilePath);
         }
 
         public ProjectRoot ProjectRoot { get; }
