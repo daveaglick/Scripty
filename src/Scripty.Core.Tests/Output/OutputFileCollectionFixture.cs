@@ -9,7 +9,7 @@ using Scripty.Core.Output;
 namespace Scripty.Core.Tests.Output
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Self | ParallelScope.Children)]
+    [Parallelizable(ParallelScope.None | ParallelScope.None)]
     public class OutputFileCollectionFixture : BaseFixture
     {
         public class SetExtensionTests : OutputFileCollectionFixture
@@ -27,7 +27,7 @@ namespace Scripty.Core.Tests.Output
                 output.SetExtension(extension);
 
                 // Then
-                Assert.AreEqual(expected, output.FilePath);
+                Assert.AreEqual(expected, output.TargetFilePath);
             }
 
             [Test]
@@ -41,7 +41,7 @@ namespace Scripty.Core.Tests.Output
                 output.SetExtension(".json");
 
                 // Then
-                Assert.AreEqual(@"C:\Test\script.json", output.FilePath);
+                Assert.AreEqual(@"C:\Test\script.json", output.TargetFilePath);
             }
         }
     }

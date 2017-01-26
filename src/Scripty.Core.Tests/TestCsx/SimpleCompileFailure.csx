@@ -1,0 +1,1 @@
+﻿Output[Yo, Taylor!I'm really happy for you, I'ma let you finish, but Beyoncé had one of the best videos of all time! ].WriteLine("namespace TestNamespace{class TestClass{public void TestMethod(){}}}");

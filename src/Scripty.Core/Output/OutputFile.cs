@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Options;
 
 namespace Scripty.Core.Output
 {
@@ -8,15 +7,33 @@ namespace Scripty.Core.Output
     {
         internal OutputFile()
         {
+            KeepOutput = true;
         }
 
-        public abstract string FilePath { get; }
+        public abstract string TargetFilePath { get; }
+        public abstract string TempFilePath { get; }
+
+        /// <summary>
+        ///     When <see cref="ScriptEngine.OutputBehavior"/> is set to  <see cref="OutputBehavior.ScriptControlsOutput"/>
+        /// this is how the script determines if the output is retained or discarded.
+        /// </summary>
+        public bool KeepOutput { get; set; }
+
+        /// <summary>
+        ///     If any output was generated from this instance
+        /// </summary>
+        public bool OutputWasGenerated { get; set; }
 
         public abstract BuildAction BuildAction { get; set; }
         
         public abstract bool FormatterEnabled { get; set; }
 
         public abstract FormatterOptions FormatterOptions { get; }
+
+        /// <summary>
+        ///     True if the output was closed for further writing
+        /// </summary>
+        public abstract bool IsClosed { get; }
 
         /// <summary>
         /// Adds another level of indentation to the output content.
@@ -209,5 +226,6 @@ namespace Scripty.Core.Output
         protected sealed override void TextWriterWriteLine(string format, object arg0, object arg1, object arg2) => WriteLine(format, arg0, arg1, arg2);
 
         protected sealed override void TextWriterWriteLine(string format, params object[] arg) => WriteLine(format, arg);
+        
     }
 }

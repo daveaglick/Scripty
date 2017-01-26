@@ -19,7 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty.Tests", "Cake.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{4D4EB799-2C47-427E-ADB3-E0329E503F35}"
 	ProjectSection(SolutionItems) = preProject
-		..\Debugging.md = ..\Debugging.md
+		..\docs\Debugging.md = ..\docs\Debugging.md
+		..\docs\Emit and Debug example.cs = ..\docs\Emit and Debug example.cs
 		..\LICENSE = ..\LICENSE
 		..\Readme.md = ..\Readme.md
 		..\ReleaseNotes.md = ..\ReleaseNotes.md
@@ -32,6 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{E6DFBDDF
 		..\build.cmd = ..\build.cmd
 		..\build.ps1 = ..\build.ps1
 		..\build.sh = ..\build.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{A1126C5C-CC1A-4EB9-8864-9690BAFDA74E}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
 Global
