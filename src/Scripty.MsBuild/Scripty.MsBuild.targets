@@ -15,11 +15,16 @@
       <ScriptyFile Condition=" '@(ScriptyFile)' == '' " Include="**\*.csx" />
     </ItemGroup>
   </Target>
-  
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\..\tools\Scripty.MsBuild.dll" TaskName="ScriptyTask" />
+
+  <!-- Allow the path to the Scripty assembly to be passed in during testing. -->
+  <PropertyGroup>
+    <ScriptyAssembly Condition=" '$(ScriptyAssembly)' == '' ">$(MSBuildThisFileDirectory)\..\tools\Scripty.MsBuild.dll</ScriptyAssembly>
+  </PropertyGroup>
+
+  <UsingTask AssemblyFile="$(ScriptyAssembly)" TaskName="ScriptyTask" />
 
   <Target Name="EvaluateScriptyFiles" DependsOnTargets="_ResolveScriptyFiles" BeforeTargets="BeforeCompile">
-    <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" ScriptFiles="@(ScriptyFile)">
+    <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" SolutionFilePath="$(SolutionPath)" ScriptyExecutable="$(ScriptyExecutable)" ScriptFiles="@(ScriptyFile)">
       <Output TaskParameter="NoneFiles" ItemName="NoneFiles" />
       <Output TaskParameter="CompileFiles" ItemName="CompileFiles" />
       <Output TaskParameter="ContentFiles" ItemName="ContentFiles" />
