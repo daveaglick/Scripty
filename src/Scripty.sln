@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty", "Cake.Script
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty.Tests", "Cake.Scripty.Tests\Cake.Scripty.Tests.csproj", "{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.Tests", "Scripty.Tests\Scripty.Tests.csproj", "{99BB915B-23A1-4FD6-918D-F6C3A174E3B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99BB915B-23A1-4FD6-918D-F6C3A174E3B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99BB915B-23A1-4FD6-918D-F6C3A174E3B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99BB915B-23A1-4FD6-918D-F6C3A174E3B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99BB915B-23A1-4FD6-918D-F6C3A174E3B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
