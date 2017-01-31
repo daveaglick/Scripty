@@ -1,7 +1,7 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.MsBuild", "Scripty.MsBuild\Scripty.MsBuild.csproj", "{02AA19AC-F899-4764-A8B8-D92AF080998D}"
 EndProject
@@ -16,23 +16,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty", "Cake.Scripty\Cake.Scripty.csproj", "{D7369930-CDB9-4BE8-B609-6E242D980251}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty.Tests", "Cake.Scripty.Tests\Cake.Scripty.Tests.csproj", "{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{4D4EB799-2C47-427E-ADB3-E0329E503F35}"
-	ProjectSection(SolutionItems) = preProject
-		..\Debugging.md = ..\Debugging.md
-		..\LICENSE = ..\LICENSE
-		..\Readme.md = ..\Readme.md
-		..\ReleaseNotes.md = ..\ReleaseNotes.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{E6DFBDDF-442A-4C3A-AB63-C78B5A6E547D}"
-	ProjectSection(SolutionItems) = preProject
-		..\appveyor.yml = ..\appveyor.yml
-		..\build.cake = ..\build.cake
-		..\build.cmd = ..\build.cmd
-		..\build.ps1 = ..\build.ps1
-		..\build.sh = ..\build.sh
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
