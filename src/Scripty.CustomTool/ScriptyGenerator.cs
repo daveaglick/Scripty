@@ -59,10 +59,11 @@ namespace Scripty
                 
                 // Run the generator and get the results
                 ScriptSource source = new ScriptSource(inputFilePath, inputFileContent);
-                ScriptEngine engine = new ScriptEngine(project.FullName)
+                ScriptEngine engine = new ScriptEngine(project.FullName, solution.FullName, null)
                 {
                     OutputBehavior = outputBehavior
                 };
+
                 ScriptResult result = engine.Evaluate(source).Result;
 
                 // Report errors

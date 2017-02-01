@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,10 @@ namespace Scripty.MsBuild
 
         [Required]
         public string ProjectFilePath { get; set; }
+
+        public string SolutionFilePath { get; set; }
+
+        public string ScriptyExecutable { get; set; }
 
         public ITaskItem[] ScriptFiles { get; set; }
 
@@ -53,24 +58,37 @@ namespace Scripty.MsBuild
                 return false;
             }
 
-            // Get the script files and construct the arguments to pass to the CLI
-            string scriptFiles = string.Join(" ", ScriptFiles
-                .Select(x => x.GetMetadata("FullPath"))
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Distinct()
-                .Select(x => "\"" + x + "\""));
+            if (string.IsNullOrEmpty(ScriptyExecutable))
+            {
+                ScriptyExecutable = Path.Combine(Path.GetDirectoryName(typeof(ScriptyTask).Assembly.Location), "Scripty.exe");
+            }
+
+            if (!File.Exists(ScriptyExecutable))
+            {
+                Log.LogError($"Scripty executable not found at '{ScriptyExecutable}'.");
+                return false;
+            }
 
             // Kick off the evaluation process, which must be done in a seperate process space
             // otherwise MSBuild complains when we construct the Roslyn workspace project since
             // it uses MSBuild to figure out what the project contains and MSBuild only supports
             // one build per process
             Log.LogMessage("Starting out-of-process script evaluation...");
-            string arguments = $"\"{ProjectFilePath}\" {scriptFiles}";
+
+            // Get the arguments. If this fails to construct 
+            // them, it will log an error and return null.
+            string arguments = CreateScriptyArguments();
+
+            if (arguments == null)
+            {
+                return false;
+            }
+
             Log.LogMessage("Arguments: " + arguments);
             List<string> outputData = new List<string>();
             List<string> errorData = new List<string>();
             Process process = new Process();
-            process.StartInfo.FileName = Path.Combine(Path.GetDirectoryName(typeof(ScriptyTask).Assembly.Location), "Scripty.exe");
+            process.StartInfo.FileName = ScriptyExecutable;
             process.StartInfo.Arguments = arguments;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.UseShellExecute = false;
@@ -153,6 +171,89 @@ namespace Scripty.MsBuild
                 }));
 
             return true;
+        }
+
+        private string CreateScriptyArguments()
+        {
+            IEnumerable<KeyValuePair<string, string>> properties;
+            List<string> args;
+
+
+            // Get the properties. This will log an error 
+            // and return null if they cannot be found.
+            properties = GetMsBuildProperties();
+
+            if (properties == null)
+            {
+                return null;
+            }
+
+            args = new List<string>();
+
+            if (!string.IsNullOrEmpty(SolutionFilePath))
+            {
+                args.Add($"--solution \"{SolutionFilePath}\"");
+            }
+
+            foreach (var property in properties)
+            {
+                args.Add($"--p \"{property.Key}={property.Value}\"");
+            }
+
+            // The project file path is a parameter, so it needs 
+            // to go after all other options, but before the scripts.
+            args.Add($"\"{ProjectFilePath}\"");
+
+            // The script files are a parameter list, so they go last.
+            args.AddRange(ScriptFiles
+                .Select(x => x.GetMetadata("FullPath"))
+                .Where(x => !string.IsNullOrEmpty(x))
+                .Distinct()
+                .Select(x => $"\"{x}\""));
+
+            return string.Join(" ", args);
+        }
+
+        private IEnumerable<KeyValuePair<string, string>> GetMsBuildProperties()
+        {
+            // We need to use reflection to get
+            // the build properties out of MSBuild.
+            try
+            {
+                int version = BuildEngine.GetType().Assembly.GetName().Version.Major;
+
+                // The name of the field that stores the IBuildComponentHost changed in MSBuild 14.
+                object host = BuildEngine.GetType().InvokeMember(
+                    (version >= 14) ? "_host" : "host",
+                    BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    BuildEngine,
+                    new object[] { }
+                );
+
+                object buildParameters = host.GetType().GetInterface("IBuildComponentHost").InvokeMember(
+                    "BuildParameters",
+                    BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance,
+                    null,
+                    host,
+                    new object[] { }
+                );
+
+                object globalProperties = buildParameters.GetType().InvokeMember(
+                    "GlobalProperties",
+                    BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance,
+                    null,
+                    buildParameters,
+                    new object[] { }
+                );
+
+                return (IDictionary<string, string>)globalProperties;
+            }
+            catch (Exception ex)
+            {
+                Log.LogError("Could not get global properties from MSBuild: " + ex.Message);
+                return null;
+            }
         }
     }
 }

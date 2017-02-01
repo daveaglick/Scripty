@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7A6A65DB-ECD8-4E9D-B8A9-078B77302C68}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{1B010E37-8AD9-4259-B06D-FEC755D8878B}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Scripty.MsBuild.Test</RootNamespace>
-    <AssemblyName>Scripty.MsBuild.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>ProjA</RootNamespace>
+    <AssemblyName>ProjA</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,9 +29,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -43,19 +40,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Include1)' == 'true' ">
+    <Compile Include="Class1.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Include2)' == 'true' ">
+    <Compile Include="Class2.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Include3)' == 'true' ">
+    <Compile Include="Class3.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(SolutionDir)' != '' ">
+    <Compile Include="ClassSolution.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Test.csx" />
   </ItemGroup>
-  <Import Project="packages\Scripty.MsBuild\build\Scripty.MsBuild.targets" Condition="Exists('packages\Scripty.MsBuild\build\Scripty.MsBuild.targets')" />
+  <Import Project="$(MSBuildProjectDirectory)\..\..\..\Scripty.MsBuild\Scripty.MsBuild.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
