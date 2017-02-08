@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.MsBuild", "Scripty.MsBuild\Scripty.MsBuild.csproj", "{02AA19AC-F899-4764-A8B8-D92AF080998D}"
 EndProject
@@ -17,9 +17,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty", "Cake.Script
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cake.Scripty.Tests", "Cake.Scripty.Tests\Cake.Scripty.Tests.csproj", "{EDDB19BE-A3C4-4002-A2D2-DCC539448A27}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{A1126C5C-CC1A-4EB9-8864-9690BAFDA74E}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
+	EndProjectSection
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.Tests", "Scripty.Tests\Scripty.Tests.csproj", "{99BB915B-23A1-4FD6-918D-F6C3A174E3B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty.MsBuild.Tests", "Scripty.MsBuild.Tests\Scripty.MsBuild.Tests.csproj", "{734C003C-6E72-42D7-B935-A5301F21D79A}"
+
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

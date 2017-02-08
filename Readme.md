@@ -195,6 +195,41 @@ The following global properties are available when evaluating your script with S
     Output["embedded.xml"].BuildAction = BuildAction.EmbeddedResource;
     ```
 
+  Controlling the **Output Behavior** for all or individual files is also available. There are three options...
+
+  - `OutputBehavior.DontOverwriteIfEvaluationFails` - If script execution produces errors, no output should be produced or altered. 
+  - `OutputBehavior.NeverGenerateOutput` - Saving script ouput is never attempted. This is useful when using scripty as a 
+  utility (inside or outside of VS).  
+  - `OutputBehavior.ScriptControlsOutput` - The script controls what to do with output by using the `.KeepOutput`"/> property value of .
+  
+  If ScriptControlsOutput is set, then this is how to control it in script. The last value stored in this variable will be the 
+  value used during output generation.
+  ```
+  //Save the default output (scriptName.cs)
+  Output.KeepOutput = true;
+
+  //Discard the default output
+  Output.KeepOutput = false;
+
+  //Keep the output of fileName
+  Output[fileName].KeepOutput = true;
+  
+  //Discard the output of fileName
+  Output[fileName].KeepOutput = false;
+
+  //... more examples in the unit tests
+  ```
+  
+
+  In Visual Studio, the default output behavior can be set by navigating to Tools -> Options -> Scripty Options and adjusting the value. By default, `DontOverwriteIfEvaluationFails`
+  is chosen. 
+
+  Command line syntax [below](##Scripty)
+  
+
+
+
+
 # Libraries
 
 Scripty support is provided via a variety of libraries (and corresponding NuGet packages) for different scenarios.
@@ -225,12 +260,27 @@ A console application that can evaluate Scripty scripts. This can be used to int
 
 ```
 >Scripty.exe --help
-usage:  <ProjectFilePath> <ScriptFilePaths>...
+usage: scripty [-e] [--attach] [--outnoc] [--outnev] [--outscr] [--]
+               <ProjectFilePath> <ScriptFilePaths>...
+
+    -e                      Display full exception details instead of
+                            just the message
+
+    --attach                Pause execution at the start of the program
+                            until a debugger is attached.
+
+    --outnoc                Do not produce or overwrite output on
+                            compile errors. This is the default.
+    --outnev                Do not produce or overwrite output.
+    --outscr                The script determines what output is
+                            retained.
 
     <ProjectFilePath>       The full path of the project file.
     <ScriptFilePaths>...    The path(s) of script files to evaluate (can
                             be absolute or relative to the project).
 ```
+Omitting an `--out*` argument results in using `--outnoc`, the current behavior, and only 
+one of the three `--out*` parameters can be used at a time. 
 
 ## Scripty.Core
 
@@ -243,3 +293,5 @@ A Cake addin for Scripty that allows you to evaluate Scripty scripts in Cake. No
 # Help!
 
 If you need help, have a feature request, or notice a bug, just submit a GitHub issue.
+
+Or if you want to give it a try, check the [Debugging Guide](docs/Debugging)

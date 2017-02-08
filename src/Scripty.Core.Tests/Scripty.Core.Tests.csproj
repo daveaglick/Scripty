@@ -88,11 +88,15 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="BaseFixture.cs" />
+    <Compile Include="EngineParams.cs" />
+    <Compile Include="EngineResults.cs" />
     <Compile Include="Output\EngineFixture.cs" />
     <Compile Include="Output\FormatterFixture.cs" />
     <Compile Include="Output\OutputFileCollectionFixture.cs" />
     <Compile Include="Output\OutputFileWriterFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptEngineTests.cs" />
+    <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Scripty.Core\Scripty.Core.csproj">
@@ -124,6 +128,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="TestCsx\SimpleCompileFailure.csx" />
+    <None Include="TestCsx\SimpleScriptIgnore.csx" />
+    <AdditionalFiles Include="TestCsx\MultiFileScriptControl.csx" />
+    <None Include="TestCsx\SimpleScriptKeep.csx" />
+    <None Include="TestCsx\SimpleSuccess.csx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

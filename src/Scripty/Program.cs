@@ -28,12 +28,19 @@ namespace Scripty
             Exception exception = e.ExceptionObject as Exception;
             if (exception != null)
             {
-                Console.Error.WriteLine(exception.ToString());
+                if (_settings.ShowFullExceptionDetails)
+                {
+                    Console.Error.WriteLine(exception.ToString());
+                }
+                else
+                {
+                    Console.Error.WriteLine(exception.Message);
+                }
             }
             Environment.Exit((int) ExitCode.UnhandledError);
         }
 
-        private readonly Settings _settings = new Settings();
+        private static readonly Settings _settings = new Settings();
 
         private int Run(string[] args)
         {
@@ -74,6 +81,7 @@ namespace Scripty
             // Get the script engine
             string solutionFilePath = null;
             string projectFilePath = Path.Combine(Environment.CurrentDirectory, _settings.ProjectFilePath);
+
             ScriptEngine engine;
 
             if (_settings.SolutionFilePath != null)
@@ -82,6 +90,8 @@ namespace Scripty
             }
 
             engine = new ScriptEngine(projectFilePath, solutionFilePath, _settings.Properties);
+            engine.OutputBehavior = _settings.GetOutputBehavior();
+
 
             // Get script files if none were specified
             IReadOnlyList<string> finalScriptFilePaths;
@@ -138,7 +148,7 @@ namespace Scripty
                 // Output the set of generated files w/ build actions
                 foreach (IOutputFileInfo outputFile in task.Result.OutputFiles)
                 {
-                    Console.WriteLine($"{outputFile.BuildAction}|{outputFile.FilePath}");
+                    Console.WriteLine($"{outputFile.BuildAction}|{outputFile.TargetFilePath}({outputFile.TempFilePath})");
                 }
             }
 
