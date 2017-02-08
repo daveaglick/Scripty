@@ -189,31 +189,7 @@ Task("Create-Tools-Package")
             }
         });
     });
-    
-Task("Test-MsBuild")
-    .IsDependentOn("Create-Packages")
-    .Does(() =>
-    {
-        if(DirectoryExists("./src/Scripty.MsBuild.Test/packages"))
-        {
-            DeleteDirectory("./src/Scripty.MsBuild.Test/packages", true);
-        }
-        NuGetRestore("./src/Scripty.MsBuild.Test/Scripty.MsBuild.Test.sln");
-        NuGetInstall("Scripty.MsBuild", new NuGetInstallSettings
-        {
-            NoCache = true,
-            Source = new [] { "file:///" + MakeAbsolute(nugetRoot).FullPath },
-            ExcludeVersion = true,
-            Prerelease = true,
-            OutputDirectory = "./src/Scripty.MsBuild.Test/packages"
-        });      
-        MSBuild("./src/Scripty.MsBuild.Test/Scripty.MsBuild.Test.sln", new MSBuildSettings()
-            .SetConfiguration("Debug")
-            .SetVerbosity(Verbosity.Minimal)
-            //.SetVerbosity(Verbosity.Diagnostic)
-        );  
-    });
-        
+            
 Task("Publish-Packages")
     .IsDependentOn("Create-Packages")
     .WithCriteria(() => isLocal)
