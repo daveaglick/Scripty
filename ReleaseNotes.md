@@ -1,3 +1,10 @@
+# 0.6.0
+
+- [Refactoring] Updated and consolidated some package versions
+- [Fix] The Scripty MSBuild task now runs "BeforeBuild" (#68, thanks @reduckted)
+- [Feature] Adds support for passing MSBuild project properties to Scripty (#66, thanks @reduckted)
+- [Feature] Adds a `Debugging.md` file to explain how to start with Scripty development (#65, thanks @StingyJack)
+
 # 0.5.0
 
 - [Feature] CLI now accepts relative paths to project files

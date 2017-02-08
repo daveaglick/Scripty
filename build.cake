@@ -273,8 +273,7 @@ Task("Package")
     .IsDependentOn("Test");
     
 Task("Test")
-    .IsDependentOn("Run-Unit-Tests")
-    .IsDependentOn("Test-MsBuild");
+    .IsDependentOn("Run-Unit-Tests");
 
 Task("Default")
     .IsDependentOn("Package");
