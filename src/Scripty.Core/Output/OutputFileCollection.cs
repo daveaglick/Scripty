@@ -14,6 +14,7 @@ namespace Scripty.Core.Output
         private readonly Dictionary<string, OutputFileWriter> _outputFiles
             = new Dictionary<string, OutputFileWriter>();
         private string _filePath;
+        private string _projectName;
         private OutputFile _defaultOutput;
 
         private bool _disposed;
@@ -68,6 +69,7 @@ namespace Scripty.Core.Output
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                     outputFile = new OutputFileWriter(filePath);
+                    outputFile.ProjectName = this._projectName;
                     _outputFiles.Add(filePath, outputFile);
                 }
                 return outputFile;
@@ -87,6 +89,17 @@ namespace Scripty.Core.Output
 
             _filePath = filePath;
             _defaultOutput = null;
+            return this;
+        }
+
+        public OutputFileCollection SetProjectName(string projectName)
+        {
+            if (projectName == null)
+            {
+                throw new ArgumentNullException(nameof(projectName));
+            }
+
+            _projectName = projectName;
             return this;
         }
 
@@ -241,6 +254,12 @@ namespace Scripty.Core.Output
         {
             get { return DefaultOutput.NewLine; }
             set { DefaultOutput.NewLine = value; }
+        }
+
+        public override string ProjectName
+        {
+            get { return _projectName; }
+            set { _projectName = value; }
         }
     }
 }

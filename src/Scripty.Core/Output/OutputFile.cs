@@ -18,6 +18,7 @@ namespace Scripty.Core.Output
 
         public abstract FormatterOptions FormatterOptions { get; }
 
+        public abstract string ProjectName { get; set; }
         /// <summary>
         /// Adds another level of indentation to the output content.
         /// </summary>

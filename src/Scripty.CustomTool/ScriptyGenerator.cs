@@ -52,7 +52,7 @@ namespace Scripty
                 string inputFilePath = projectItem.Properties.Item("FullPath").Value.ToString();
                 Project project = projectItem.ContainingProject;
                 Solution solution = projectItem.DTE.Solution;
-
+                
                 // Run the generator and get the results
                 ScriptSource source = new ScriptSource(inputFilePath, inputFileContent);
                 ScriptEngine engine = new ScriptEngine(project.FullName, solution.FullName, null);
@@ -67,14 +67,37 @@ namespace Scripty
                     }
                     return null;
                 }
-                
+
                 // Add generated files to the project
                 foreach (IOutputFileInfo outputFile in result.OutputFiles.Where(x => x.BuildAction != BuildAction.GenerateOnly))
                 {
-                    ProjectItem outputItem = projectItem.ProjectItems.Cast<ProjectItem>()
-                        .FirstOrDefault(x => x.Properties.Item("FullPath")?.Value?.ToString() == outputFile.FilePath)
-                        ?? projectItem.ProjectItems.AddFromFile(outputFile.FilePath);
-                    outputItem.Properties.Item("ItemType").Value = outputFile.BuildAction.ToString();
+                    ProjectItem outputItem = null;
+                    // Allotting for the ability to change the Project Name on a per file basis, which is why we are using a nested
+                    // loop here. If there was no project Name set at all, assume the script project.
+                    if (!string.IsNullOrWhiteSpace(outputFile.ProjectName))
+                    {
+                        foreach (Project p in solution.Projects)
+                        {
+                            if (p.Name == outputFile.ProjectName)
+                            {
+                                outputItem = p.ProjectItems.Cast<ProjectItem>()
+                               .FirstOrDefault(x => x.Properties.Item("FullPath")?.Value?.ToString() == outputFile.FilePath)
+                               ?? p.ProjectItems.AddFromFile(outputFile.FilePath);
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        outputItem = projectItem.ProjectItems.Cast<ProjectItem>()
+                            .FirstOrDefault(x => x.Properties.Item("FullPath")?.Value?.ToString() == outputFile.FilePath)
+                            ?? projectItem.ProjectItems.AddFromFile(outputFile.FilePath);
+                    }
+
+                    if (outputItem != null)
+                    {
+                        outputItem.Properties.Item("ItemType").Value = outputFile.BuildAction.ToString();
+                    }                    
                 }
 
                 // Remove/delete files from the last generation but not in this one
