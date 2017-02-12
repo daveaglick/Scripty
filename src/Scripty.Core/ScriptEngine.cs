@@ -7,11 +7,14 @@ using Microsoft.CodeAnalysis.CSharp.Formatting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Scripting;
-using Scripty.Core.Output;
 using Scripty.Core.ProjectTree;
 
 namespace Scripty.Core
 {
+    using System.Collections;
+    using System.Reflection;
+    using Resolvers;
+
     public class ScriptEngine
     {
         private readonly string _projectFilePath;
@@ -50,18 +53,31 @@ namespace Scripty.Core
 
         public async Task<ScriptResult> Evaluate(ScriptSource source)
         {
-            ScriptOptions options = ScriptOptions.Default
+            var resolver = new InterceptDirectiveResolver();
+            var assembliesToRef = new List<Assembly>
+            {
+                typeof(object).Assembly, //mscorlib
+                typeof(Microsoft.CodeAnalysis.Project).Assembly, // Microsoft.CodeAnalysis.Workspaces
+                typeof(Microsoft.Build.Evaluation.Project).Assembly, // Microsoft.Build
+                typeof(ScriptEngine).Assembly // Scripty.Core
+            };
+
+            var namepspaces = new List<string>
+            {
+                 "System",
+                "Scripty.Core",
+                "Scripty.Core.Output",
+                "Scripty.Core.ProjectTree"
+            };
+
+            var options = ScriptOptions.Default
                 .WithFilePath(source.FilePath)
-                .WithReferences(
-                    typeof(Microsoft.CodeAnalysis.Project).Assembly,  // Microsoft.CodeAnalysis.Workspaces
-                    typeof(Microsoft.Build.Evaluation.Project).Assembly,  // Microsoft.Build
-                    typeof(ScriptEngine).Assembly  // Scripty.Core
-                    )
-                .WithImports(
-                    "System",
-                    "Scripty.Core",
-                    "Scripty.Core.Output",
-                    "Scripty.Core.ProjectTree");
+                .WithReferences(assembliesToRef)
+                .WithImports(namepspaces)
+                .WithSourceResolver(resolver);
+
+            var scriptResult = new ScriptResult();
+            Exception caughtException = null;
 
             using (ScriptContext context = GetContext(source.FilePath))
             {
