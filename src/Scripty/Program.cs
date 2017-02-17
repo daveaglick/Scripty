@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Scripty.Core;
@@ -144,9 +143,10 @@ namespace Scripty
                 }
 
                 // Output the set of generated files w/ build actions
+                // The MSBuild task relies on this information 
                 foreach (IOutputFileInfo outputFile in task.Result.OutputFiles)
                 {
-                    Console.WriteLine($"{outputFile.BuildAction}|{outputFile.TargetFilePath}({outputFile.TempFilePath})");
+                    Console.WriteLine($"{outputFile.BuildAction}|{outputFile.TargetFilePath}");
                 }
             }
 

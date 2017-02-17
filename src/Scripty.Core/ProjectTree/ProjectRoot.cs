@@ -24,7 +24,7 @@ namespace Scripty.Core.ProjectTree
         public ProjectRoot(string projectFilePath, string solutionFilePath, IReadOnlyDictionary<string, string> properties)
             : base(null, string.Empty, null, null)
         {
-            FilePath = projectFilePath;
+            FilePath = Path.GetFullPath(projectFilePath);
             _solutionFilePath = solutionFilePath;
             _properties = new Dictionary<string, string>();
 

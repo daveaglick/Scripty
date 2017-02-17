@@ -2,12 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.CommandLine;
     using Core;
 
-namespace Scripty
-{
     public class Settings
     {
         public string ProjectFilePath = null;
@@ -33,7 +30,8 @@ namespace Scripty
             {
                 syntax.DefineOption("e", ref _showFullExceptionDetails, "Display full exception details instead of just the message");
                 syntax.DefineOption("attach", ref Attach, "Pause execution at the start of the program until a debugger is attached.");
-                syntax.DefineOption("outnoc", ref _noOutputOnCompileErr, "Do not produce or overwrite output on compile errors. This is the default.");
+                syntax.DefineOption("outnoc", ref _noOutputOnCompileErr,
+                    "Do not produce or overwrite output on compile errors. This is the default.");
                 syntax.DefineOption("outnev", ref _neverOverwriteOutput, "Do not produce or overwrite output.");
                 syntax.DefineOption("outscr", ref _scriptControlsOutput, "The script determines what output is retained.");
                 syntax.DefineOption("solution", ref SolutionFilePath, "The full path of the solution file that contains the project (optional).");
@@ -98,7 +96,7 @@ namespace Scripty
 
             if (ScriptControlsOutput)
             {
-                return  OutputBehavior.ScriptControlsOutput;
+                return OutputBehavior.ScriptControlsOutput;
             }
 
             return OutputBehavior.DontOverwriteIfEvaluationFails;
