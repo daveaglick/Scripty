@@ -5,7 +5,6 @@
     using System.Collections.Immutable;
     using System.Linq;
     using System.Reflection;
-    using Core.Output;
     using Core.Resolvers;
     using NUnit.Framework;
 
@@ -41,7 +40,6 @@
 
             CsTestHelpers.RemoveFiles($"*.{CsRewriter.DEFAULT_REWRITE_TEMP_EXTENSION}");
             CsTestHelpers.RemoveFiles($"*.{CsRewriter.DEFAULT_REWRITE_EXTENSION}");
-            CsxTestHelpers.RemoveFiles($"*.{OutputFileCollection.DEFAULT_TEMP_EXTENSION}");
         }
 
         [OneTimeTearDown]
@@ -75,7 +73,7 @@
             var result = CsxTestHelpers.EvaluateScript(_scriptWithoutAsmOrScriptOrClassRef);
             
             AssertThereAreNoErrors(result);
-            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().FilePath);
             Assert.AreEqual(1, actualResult.Length);
             Assert.True(HasScriptedTestContent(actualResult[0]), actualResult[0]);
         }
@@ -86,7 +84,7 @@
             var result = CsxTestHelpers.EvaluateScript(_scriptWithAsm_ButNoScriptOrClassRef);
 
             AssertThereAreNoErrors(result);
-            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().FilePath);
             Assert.AreEqual(2, actualResult.Length);
             Assert.True(HasScriptedTestContent(actualResult[0]), actualResult[0]);
             Assert.True(HasReferencedAssemblyContent(actualResult[1]), actualResult[1]);
@@ -98,7 +96,7 @@
             var result = CsxTestHelpers.EvaluateScript(_scriptWithAsmAndScriptRef_ButNoClassRef);
 
             AssertThereAreNoErrors(result);
-            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().FilePath);
             Assert.AreEqual(3, actualResult.Length);
             Assert.True(HasScriptedTestContent(actualResult[0]), actualResult[0]);
             Assert.True(HasReferencedAssemblyContent(actualResult[1]), actualResult[1]);
@@ -111,7 +109,7 @@
             var result = CsxTestHelpers.EvaluateScript(_scriptWithScriptAndClassRef_ButNoAsmRef);
 
             AssertThereAreNoErrors(result);
-            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().FilePath);
             Assert.AreEqual(4, actualResult.Length);
             Assert.True(HasScriptedTestContent(actualResult[0]), actualResult[0]);
             Assert.True(HasReferencedScriptTestContent(actualResult[1]), actualResult[1]);
@@ -125,7 +123,7 @@
             var result = CsxTestHelpers.EvaluateScript(_scriptWithScriptRef_ButNoAsmOrClassRef);
 
             AssertThereAreNoErrors(result);
-            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().FilePath);
             Assert.AreEqual(2, actualResult.Length);
             Assert.True(HasScriptedTestContent(actualResult[0]), actualResult[0]);
             Assert.True(HasReferencedScriptTestContent(actualResult[1]), actualResult[1]);
@@ -138,7 +136,7 @@
             var result = CsxTestHelpers.EvaluateScript(_scriptWithClassRef_ButNoAsmmOrScriptRef);
 
             AssertThereAreNoErrors(result);
-            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().FilePath);
             Assert.AreEqual(3, actualResult.Length);
             Assert.True(HasScriptedTestContent(actualResult[0]), actualResult[0]);
             Assert.True(HasReferencedClassTestContentWhole(actualResult[1]), actualResult[1]);
@@ -151,7 +149,7 @@
             var result = CsxTestHelpers.EvaluateScript(_scriptWithAsmAndClassAndScriptRef);
 
             AssertThereAreNoErrors(result);
-            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(result.OutputFiles.Single().FilePath);
             Assert.AreEqual(5, actualResult.Length);
             Assert.True(HasScriptedTestContent(actualResult[0]), actualResult[0]);
             Assert.True(HasReferencedAssemblyContent(actualResult[1]), actualResult[1]);
@@ -194,7 +192,7 @@
                 "// Emitting prop with backing field 69",
                 "// using the referenced class to output - Value_"
             };
-            var actualResult = CsxTestHelpers.GetFileLines(runResult.OutputFiles.Single().TargetFilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(runResult.OutputFiles.Single().FilePath);
             StringAssert.AreEqualIgnoringCase(expectedResult[0], actualResult[0]);
             StringAssert.AreEqualIgnoringCase(expectedResult[1], actualResult[1]);
             StringAssert.StartsWith(expectedResult[2], actualResult[2]);

@@ -187,7 +187,6 @@
     <Compile Include="Resolvers\CsRewriter.cs" />
     <Compile Include="Resolvers\FileUtilities.cs" />
     <Compile Include="Resolvers\InterceptDirectiveResolver.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="Resolvers\Enums.cs" />
     <Compile Include="Output\BuildAction.cs" />
     <Compile Include="Output\FormatterOptions.cs" />

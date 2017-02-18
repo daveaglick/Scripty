@@ -13,6 +13,7 @@ namespace Scripty.Core
 {
     using System.Collections;
     using System.Reflection;
+    using Output;
     using Resolvers;
 
     public class ScriptEngine
@@ -75,10 +76,7 @@ namespace Scripty.Core
                 .WithReferences(assembliesToRef)
                 .WithImports(namepspaces)
                 .WithSourceResolver(resolver);
-
-            var scriptResult = new ScriptResult();
-            Exception caughtException = null;
-
+            
             using (ScriptContext context = GetContext(source.FilePath))
             {
                 try
