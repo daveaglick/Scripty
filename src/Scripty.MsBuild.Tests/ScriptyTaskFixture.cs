@@ -25,13 +25,16 @@ namespace Scripty.MsBuild.Tests
 
         private static string FindMsBuild()
         {
-            foreach (var v in new[] { "14.0", "12.0", "4.0" })
+            foreach (var v in new[] { "15.0", "14.0", "12.0", "4.0" })
             {
                 string exe = null;
 
                 using (var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey($@"SOFTWARE\Microsoft\MSBuild\ToolsVersions\{v}"))
                 {
-                    exe = (string)key.GetValue("MSBuildToolsPath");
+                    if (key != null)
+                    {
+                        exe = (string) key.GetValue("MSBuildToolsPath");
+                    }
                 }
 
                 if (exe != null)
@@ -56,15 +59,21 @@ namespace Scripty.MsBuild.Tests
 
             var info = new ProcessStartInfo(_msbuild, args)
             {
-                WindowStyle = ProcessWindowStyle.Hidden
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
             };
 
-            using (var p = Process.Start(info))
-            {
-                p.WaitForExit();
-                Assert.AreEqual(0, p.ExitCode);
-            }
+            Process p = new Process();
+            p.StartInfo = info;
+            p.OutputDataReceived += (s, e) => TestContext.Out.WriteLine(e.Data);
+            p.ErrorDataReceived += (s, e) => TestContext.Out.WriteLine(e.Data);
+            p.Start();
+            p.BeginOutputReadLine();
+            p.WaitForExit();
 
+            Assert.AreEqual(0, p.ExitCode);
             Assert.That(File.Exists(_output));
             Assert.AreEqual($@"//Class1.cs;Class3.cs;ClassSolution.cs", File.ReadAllText(_output));
         }
