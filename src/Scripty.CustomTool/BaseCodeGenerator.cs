@@ -1,7 +1,4 @@
-﻿//Dave Glick - is this just template copyright stuff that was brought in or 
-// is this something else?
-
-/***************************************************************************
+﻿/***************************************************************************
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 This code is licensed under the Visual Studio SDK license terms.
