@@ -8,7 +8,7 @@ The `InterceptDirectiveResolver` is an alternate implementation that allows the 
 For most uses, the script would look something like this...
 
 ``` c#
-#r ".\..\..\..\packages\NUnit.3.4.0\lib\net45\nunit.framework.dll"
+#r ".\..\..\..\packages\NUnit.3.6.1\lib\net45\nunit.framework.dll"
 #load "..\TestCs\ReferencedClass.cs"
 #load "ReferencedScript.csx"
 
