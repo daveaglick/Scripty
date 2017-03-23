@@ -23,7 +23,7 @@
 
   <UsingTask AssemblyFile="$(ScriptyAssembly)" TaskName="ScriptyTask" />
 
-  <Target Name="EvaluateScriptyFiles" DependsOnTargets="_ResolveScriptyFiles" BeforeTargets="BeforeBuild">
+  <Target Name="EvaluateScriptyFiles" DependsOnTargets="_ResolveScriptyFiles" BeforeTargets="BeforeCompile">
     <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" SolutionFilePath="$(SolutionPath)" ScriptyExecutable="$(ScriptyExecutable)" ScriptFiles="@(ScriptyFile)">
       <Output TaskParameter="NoneFiles" ItemName="NoneFiles" />
       <Output TaskParameter="CompileFiles" ItemName="CompileFiles" />

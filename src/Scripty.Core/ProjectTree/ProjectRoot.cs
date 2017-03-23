@@ -151,5 +151,29 @@ namespace Scripty.Core.ProjectTree
                 return base.Children;
             }
         }
+
+        public static ProjectRoot FindProject(string projectName, string solutionPath, IReadOnlyDictionary<string, string> properties)
+        {
+            ProjectRoot result = null;
+
+            MSBuildWorkspace ws = MSBuildWorkspace.Create();
+            if (!string.IsNullOrWhiteSpace(solutionPath))
+            {
+               var solution =  ws.OpenSolutionAsync(solutionPath).Result;
+                if (solution != null)
+                {
+                    foreach (Project p in solution.Projects)
+                    {
+                        if (p.Name == projectName)
+                        {
+                            result = new ProjectRoot(p.FilePath, solutionPath, properties);
+                        }
+                    }
+                }
+            }
+            
+
+            return result;
+        }
     }
 }

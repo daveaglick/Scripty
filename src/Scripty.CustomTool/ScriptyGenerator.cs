@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Scripty.Core;
 using Scripty.Core.Output;
 
@@ -68,38 +70,67 @@ namespace Scripty
                     return null;
                 }
 
-                // Add generated files to the project
-                foreach (IOutputFileInfo outputFile in result.OutputFiles.Where(x => x.BuildAction != BuildAction.GenerateOnly))
+                using (var sw = File.CreateText("C:\\temp\\SCRIPTY_log.txt"))
                 {
-                    ProjectItem outputItem = null;
-                    // Allotting for the ability to change the Project Name on a per file basis, which is why we are using a nested
-                    // loop here. If there was no project Name set at all, assume the script project.
-                    if (!string.IsNullOrWhiteSpace(outputFile.ProjectName))
-                    {
-                        foreach (Project p in solution.Projects)
-                        {
-                            if (p.Name == outputFile.ProjectName)
-                            {
-                                outputItem = p.ProjectItems.Cast<ProjectItem>()
-                               .FirstOrDefault(x => x.Properties.Item("FullPath")?.Value?.ToString() == outputFile.FilePath)
-                               ?? p.ProjectItems.AddFromFile(outputFile.FilePath);
-                            }
-
-                        }
-                    }
-                    else
-                    {
-                        outputItem = projectItem.ProjectItems.Cast<ProjectItem>()
-                            .FirstOrDefault(x => x.Properties.Item("FullPath")?.Value?.ToString() == outputFile.FilePath)
-                            ?? projectItem.ProjectItems.AddFromFile(outputFile.FilePath);
-                    }
-
-                    if (outputItem != null)
-                    {
-                        outputItem.Properties.Item("ItemType").Value = outputFile.BuildAction.ToString();
-                    }                    
+                    sw.Write(Encoding.ASCII.GetBytes("Test"));
+                    sw.Close();
                 }
 
+                using (var sw = File.CreateText("C:\\temp\\SCRIPTY_SUB_log.txt"))
+                {
+                    sw.Write(Encoding.ASCII.GetBytes("Test"));
+                    sw.Close();
+                }
+
+                using (var log = File.AppendText("C:\\temp\\SCRIPTY_log.txt"))
+                {
+                    // Add generated files to the project
+                    foreach (
+                        IOutputFileInfo outputFile in
+                        result.OutputFiles.Where(x => x.BuildAction != BuildAction.GenerateOnly))
+                    {
+                        ProjectItem outputItem = null;
+                        //Testing to make sure the path is valid. Invalid paths will cause the AddFromFile to fail with a null pointer exception
+                        if (outputFile.FilePath.IndexOfAny(Path.GetInvalidPathChars()) > -1 || outputFile.FilePath.IndexOf(@"\\") > -1)
+                        {
+                            throw new Exception($"The Path provided, {outputFile.FilePath}, contains invalid characters.");
+                        }
+
+                        // Allotting for the ability to change the Project Name on a per file basis, which is why we are using a nested
+                        // loop here. If there was no project Name set at all, assume the script project.
+                        if (!string.IsNullOrWhiteSpace(outputFile.ProjectName))
+                        {
+                            foreach (Project p in solution.Projects)
+                            {
+                                if (p.Name == outputFile.ProjectName)
+                                {
+                                    outputItem = p.ProjectItems.Cast<ProjectItem>()
+                                                .FirstOrDefault(
+                                                    x =>
+                                                        x.Properties.Item("FullPath")?.Value?.ToString() ==
+                                                        outputFile.FilePath)
+                                            ?? p.ProjectItems?.AddFromFile(outputFile.FilePath);
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            outputItem = projectItem.ProjectItems.Cast<ProjectItem>()
+                                             .FirstOrDefault(
+                                                 x =>
+                                                     x.Properties.Item("FullPath")?.Value?.ToString() ==
+                                                     outputFile.FilePath)
+                                         ?? projectItem.ProjectItems.AddFromFile(outputFile.FilePath);
+                        }
+
+                        if (outputItem != null)
+                        {
+                            outputItem.Properties.Item("ItemType").Value = outputFile.BuildAction.ToString();
+                        }
+                    }
+                    log.Close();
+                }
                 // Remove/delete files from the last generation but not in this one
                 string logPath = Path.ChangeExtension(inputFilePath, ".log");
                 if (File.Exists(logPath))

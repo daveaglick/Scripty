@@ -15,6 +15,9 @@ namespace Scripty.Core
     public class ScriptEngine
     {
         private readonly string _projectFilePath;
+        private ProjectRoot _projectRoot;
+        private string _solutionFilePath;
+        private IReadOnlyDictionary<string, string> _properties;
 
         public ScriptEngine(string projectFilePath)
             : this(projectFilePath, null, null)
@@ -43,10 +46,12 @@ namespace Scripty.Core
             }
 
             _projectFilePath = projectFilePath;
-            ProjectRoot = new ProjectRoot(projectFilePath, solutionFilePath, properties);
+            _projectRoot = new ProjectRoot(projectFilePath, solutionFilePath, properties);
+            _solutionFilePath = solutionFilePath;
+            _properties = properties;
         }
 
-        public ProjectRoot ProjectRoot { get; }
+        public ProjectRoot ProjectRoot => this._projectRoot;
 
         public async Task<ScriptResult> Evaluate(ScriptSource source)
         {
@@ -75,7 +80,18 @@ namespace Scripty.Core
 
                         if (outputFile.FormatterEnabled)
                         {
-                            var document = ProjectRoot.Analysis.AddDocument(outputFile.FilePath, File.ReadAllText(outputFile.FilePath));
+                            //If the user has specified a Project in the Outputfile.ProjectName, we need to see if we can find that project
+                            //in the solution, and if so, add it to that location. In that case, we need to change the project root.
+                            if (!string.IsNullOrWhiteSpace(outputFile.ProjectName))
+                            {
+                                this._projectRoot = ProjectRoot.FindProject(outputFile.ProjectName, this._solutionFilePath, this._properties);
+                            }
+                            else
+                            {
+                                this._projectRoot = new ProjectRoot(this._projectFilePath, this._solutionFilePath, this._properties);
+                            }
+                            
+                            var document = this._projectRoot.Analysis.AddDocument(outputFile.FilePath, File.ReadAllText(outputFile.FilePath));
                             
                             var resultDocument = await Formatter.FormatAsync(
                                 document,
