@@ -159,7 +159,7 @@ namespace Scripty.Core.ProjectTree
             MSBuildWorkspace ws = MSBuildWorkspace.Create();
             if (!string.IsNullOrWhiteSpace(solutionPath))
             {
-               var solution =  ws.OpenSolutionAsync(solutionPath).Result;
+                var solution = ws.OpenSolutionAsync(solutionPath).Result;
                 if (solution != null)
                 {
                     foreach (Project p in solution.Projects)
@@ -171,7 +171,7 @@ namespace Scripty.Core.ProjectTree
                     }
                 }
             }
-            
+
 
             return result;
         }

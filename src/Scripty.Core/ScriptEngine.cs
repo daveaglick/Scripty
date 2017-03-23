@@ -51,7 +51,7 @@ namespace Scripty.Core
             _properties = properties;
         }
 
-        public ProjectRoot ProjectRoot => this._projectRoot;
+        public ProjectRoot ProjectRoot { get; }
 
         public async Task<ScriptResult> Evaluate(ScriptSource source)
         {
@@ -90,8 +90,8 @@ namespace Scripty.Core
                             {
                                 this._projectRoot = new ProjectRoot(this._projectFilePath, this._solutionFilePath, this._properties);
                             }
-                            
-                            var document = this._projectRoot.Analysis.AddDocument(outputFile.FilePath, File.ReadAllText(outputFile.FilePath));
+
+                            var document = ProjectRoot.Analysis.AddDocument(outputFile.FilePath, File.ReadAllText(outputFile.FilePath));
                             
                             var resultDocument = await Formatter.FormatAsync(
                                 document,
