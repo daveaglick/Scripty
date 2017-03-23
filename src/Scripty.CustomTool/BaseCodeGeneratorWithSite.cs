@@ -169,8 +169,6 @@ namespace Scripty
         /// </returns>
         protected Project GetProject()
         {
-            Project p = GetProjectItem().ContainingProject;
-            
             return GetProjectItem().ContainingProject;
         }
     }
