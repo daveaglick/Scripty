@@ -1,3 +1,7 @@
+# 0.7.1
+
+- [Fix] Fix for binding redirects in NuGet package
+
 # 0.7.0
 
 - [Refactoring] Updated all packages, including Roslyn which provides C# 7 support
