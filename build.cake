@@ -228,7 +228,7 @@ Task("Publish-Release")
         {
             Credentials = new Credentials(githubToken)
         };
-        var release = github.Release.Create("daveaglick", "Scripty", new NewRelease("v" + semVersion) 
+        var release = github.Repository.Release.Create("daveaglick", "Scripty", new NewRelease("v" + semVersion) 
         {
             Name = semVersion,
             Body = string.Join(Environment.NewLine, releaseNotes.Notes),
@@ -239,7 +239,7 @@ Task("Publish-Release")
         var zipPath = buildResultDir + File(zipFile);
         using (var zipStream = System.IO.File.OpenRead(zipPath.Path.FullPath))
         {
-            var releaseAsset = github.Release.UploadAsset(release, new ReleaseAssetUpload(zipFile, "application/zip", zipStream, null)).Result;
+            var releaseAsset = github.Repository.Release.UploadAsset(release, new ReleaseAssetUpload(zipFile, "application/zip", zipStream, null)).Result;
         }
     });
     

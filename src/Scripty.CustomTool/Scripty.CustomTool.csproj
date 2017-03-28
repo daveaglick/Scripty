@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Scripty</RootNamespace>
     <AssemblyName>Scripty</AssemblyName>
-    <VsSdkTargets>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\VSSDK\Microsoft.VsSDK.targets</VsSdkTargets>
+    <VsSdkTargets>..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\tools\vssdk\Microsoft.VsSDK.targets</VsSdkTargets>
     <StartAction>Program</StartAction>
     <StartProgram>$(MSBuildProgramFiles32)\Microsoft Visual Studio $(VisualStudioVersion)\Common7\IDE\devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp /log</StartArguments>

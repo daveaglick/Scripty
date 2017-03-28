@@ -203,12 +203,7 @@
     <None Include="Resolvers\TestCsx\WithScriptAndClassRef_ButNoAsmRef.csx" />
     <None Include="Resolvers\TestCsx\WithClassRef_ButNoAsmOrScriptRef.csx" />
     <None Include="Resolvers\TestCsx\WithScriptRef_ButNoAsmOrClassRef.csx" />
-    <None Include="TestCsx\SimpleCompileFailure.csx" />
-    <None Include="TestCsx\SimpleScriptIgnore.csx" />
-    <AdditionalFiles Include="TestCsx\MultiFileScriptControl.csx" />
-    <None Include="TestCsx\SimpleScriptKeep.csx" />
     <None Include="Resolvers\TestCsx\WithAsmAndClassAndScriptRef.csx" />
-    <None Include="TestCsx\SimpleSuccess.csx" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

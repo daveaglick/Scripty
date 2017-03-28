@@ -1,3 +1,9 @@
+# 0.7.0
+
+- [Refactoring] Updated all packages, including Roslyn which provides C# 7 support
+- [Feature] Updated VSIX for Visual Studio 2017 (#73)
+- [Feature] Support for #load directives to load .cs files (#76, thanks @StingyJack)
+
 # 0.6.0
 
 - [Refactoring] Updated and consolidated some package versions
