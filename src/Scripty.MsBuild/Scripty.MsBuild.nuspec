@@ -17,6 +17,8 @@
   <files>
     <file src="bin\$configuration$\Scripty.MsBuild.targets" target="build" />
     <file src="..\Scripty\bin\$configuration$\*.dll" target="tools" />
+    <file src="..\Scripty\bin\$configuration$\*.dll.config" target="tools" />
     <file src="..\Scripty\bin\$configuration$\*.exe" target="tools" />
+    <file src="..\Scripty\bin\$configuration$\*.exe.config" target="tools" />
   </files>
 </package>
