@@ -83,6 +83,7 @@
       <HintPath>..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Composition.AttributedModel, Version=1.0.30.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.AttributedModel.dll</HintPath>
@@ -173,9 +174,11 @@
     <Compile Include="Resolvers\FileUtilities.cs" />
     <Compile Include="Resolvers\InterceptDirectiveResolver.cs" />
     <Compile Include="Resolvers\Enums.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Output\BuildAction.cs" />
     <Compile Include="Output\FormatterOptions.cs" />
     <Compile Include="Output\Indent.cs" />
+    <Compile Include="Output\IOutputFileWriter.cs" />
     <Compile Include="Output\IOutputFileInfo.cs" />
     <Compile Include="Output\OutputFile.cs" />
     <Compile Include="Output\OutputFileTextWriter.cs" />

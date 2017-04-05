@@ -12,6 +12,7 @@ using Scripty.Core.Output;
 
 namespace Scripty
 {
+    
     /// <summary>
     /// This is the generator class. 
     /// When setting the 'Custom Tool' property of a C# or VB project item to "Scripty", 
@@ -53,9 +54,15 @@ namespace Scripty
                 Project project = projectItem.ContainingProject;
                 Solution solution = projectItem.DTE.Solution;
 
+                var options = projectItem.DTE.Properties[ScriptyOptions.CATEGORY, ScriptyOptions.PAGE];
+                var outputBehavior = (OutputBehavior)options.Item(ScriptyOptions.ITEM_OUTPUT_BEHAVIOR).Value;
+                
                 // Run the generator and get the results
                 ScriptSource source = new ScriptSource(inputFilePath, inputFileContent);
-                ScriptEngine engine = new ScriptEngine(project.FullName, solution.FullName, null);
+                ScriptEngine engine = new ScriptEngine(project.FullName, solution.FullName, null)
+                {
+                    OutputBehavior = outputBehavior
+                };
                 ScriptResult result = engine.Evaluate(source).Result;
 
                 // Report errors
@@ -72,8 +79,8 @@ namespace Scripty
                 foreach (IOutputFileInfo outputFile in result.OutputFiles.Where(x => x.BuildAction != BuildAction.GenerateOnly))
                 {
                     ProjectItem outputItem = projectItem.ProjectItems.Cast<ProjectItem>()
-                        .FirstOrDefault(x => x.Properties.Item("FullPath")?.Value?.ToString() == outputFile.FilePath)
-                        ?? projectItem.ProjectItems.AddFromFile(outputFile.FilePath);
+                        .FirstOrDefault(x => x.Properties.Item("FullPath")?.Value?.ToString() == outputFile.TargetFilePath)
+                        ?? projectItem.ProjectItems.AddFromFile(outputFile.TargetFilePath);
                     outputItem.Properties.Item("ItemType").Value = outputFile.BuildAction.ToString();
                 }
 
@@ -82,14 +89,14 @@ namespace Scripty
                 if (File.Exists(logPath))
                 {
                     string[] logLines = File.ReadAllLines(logPath);
-                    foreach (string fileToRemove in logLines.Where(x => result.OutputFiles.All(y => y.FilePath != x)))
+                    foreach (string fileToRemove in logLines.Where(x => result.OutputFiles.All(y => y.TargetFilePath != x)))
                     {
                         solution.FindProjectItem(fileToRemove)?.Delete();
                     }
                 }
 
                 // Create the log file
-                return Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, result.OutputFiles.Select(x => x.FilePath)));
+                return Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, result.OutputFiles.Select(x => x.TargetFilePath)));
             }
             catch (Exception ex)
             {

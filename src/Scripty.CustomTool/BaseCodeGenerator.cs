@@ -63,13 +63,15 @@ namespace Scripty
         /// <param name="pcbOutput">[out] Returns the count of bytes in the rgbOutputFileContent array</param>
         /// <param name="pGenerateProgress">A reference to the IVsGeneratorProgress interface through which the generator can report its progress to the project system</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns E_FAIL</returns>
-        int IVsSingleFileGenerator.Generate(string wszInputFilePath, string bstrInputFileContents, string wszDefaultNamespace, IntPtr[] rgbOutputFileContents, out uint pcbOutput, IVsGeneratorProgress pGenerateProgress)
+        int IVsSingleFileGenerator.Generate(string wszInputFilePath, string bstrInputFileContents, string wszDefaultNamespace, IntPtr[] rgbOutputFileContents, 
+            out uint pcbOutput, IVsGeneratorProgress pGenerateProgress)
         {
-            if (bstrInputFileContents == null)
+            if (string.IsNullOrEmpty(bstrInputFileContents))
             {
-                throw new ArgumentNullException(bstrInputFileContents);
+                pcbOutput = 0;
+                return VSConstants.S_OK;
             }
-
+            
             codeFilePath = wszInputFilePath;
             codeFileNameSpace = wszDefaultNamespace;
             codeGeneratorProgress = pGenerateProgress;

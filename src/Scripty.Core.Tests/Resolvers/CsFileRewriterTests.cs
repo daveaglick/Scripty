@@ -61,7 +61,7 @@
                 "// Emitting prop with backing field 69",
                 "// using the referenced class to output - Value_"
             };
-            var actualResult = CsxTestHelpers.GetFileLines(runResult.OutputFiles.Single().FilePath);
+            var actualResult = CsxTestHelpers.GetFileLines(runResult.OutputFiles.Single().TargetFilePath);
             StringAssert.AreEqualIgnoringCase(expectedResult[0], actualResult[0]);
             StringAssert.AreEqualIgnoringCase(expectedResult[1], actualResult[1]);
             StringAssert.StartsWith(expectedResult[2], actualResult[2]);
