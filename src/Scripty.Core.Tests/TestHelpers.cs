@@ -4,24 +4,43 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Reflection;
 
     public class TestHelpers
     {
         public const string TEST_FILE_CONTENT = "TESTCONTENT";
-        private readonly string _ProjectFilePath;
-        private string _TestFileSubfolder;
+        public string ProjectFilePath { get; }
+        private readonly string _testFileSubfolder;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="TestHelpers"/> class.
+        /// </summary>
+        /// <param name="testFileSubfolder">The test file subfolder relative to the project root.</param>
         public TestHelpers(string testFileSubfolder = "")
         {
-            _ProjectFilePath = Path.Combine(GetProjectRootFolder(), "Scripty.Core.Tests.csproj");
-            _TestFileSubfolder = testFileSubfolder;
+            ProjectFilePath = Path.Combine(GetProjectRootFolder(), "Scripty.Core.Tests.csproj");
+            _testFileSubfolder = testFileSubfolder;
         }
 
         public ScriptEngine BuildScriptEngine()
         {
-            var se = new ScriptEngine(_ProjectFilePath);
+            var se = new ScriptEngine(ProjectFilePath);
             return se;
         }
+
+        public ScriptResult EvaluateScript(string scriptFilePath, List<Assembly> additionalAssemblies = null,
+            List<string> additionalNamespaces = null, ScriptEngine engine = null)
+        {
+            var eng = engine;
+            if (eng == null)
+            {
+                eng = BuildScriptEngine();
+            }
+            var ss = new ScriptSource(scriptFilePath, GetFileContent(scriptFilePath));
+            var result = eng.Evaluate(ss).Result; // additionalAssemblies, additionalNamespaces).Result;
+            return result;
+        }
+
 
         public static string GetProjectRootFolder()
         {
@@ -30,7 +49,7 @@
 
         public string GetTestFileSubFolder()
         {
-            return Path.Combine(GetProjectRootFolder(), _TestFileSubfolder);
+            return Path.Combine(GetProjectRootFolder(), _testFileSubfolder);
         }
 
         public string GetTestFilePath(string fileName)
@@ -43,9 +62,13 @@
             return File.ReadAllText(GetTestFilePath(fileName));
         }
 
+        public void WriteFileContent(string fileName, string fileContent)
+        {
+            File.WriteAllText(fileName, fileContent);
+        }
+
         public void RemoveFiles(List<string> filesToRemoveIfPresent)
         {
-
             if (filesToRemoveIfPresent != null)
             {
                 foreach (var file in filesToRemoveIfPresent)
@@ -58,7 +81,6 @@
                     }
                 }
             }
-
         }
 
 
@@ -66,7 +88,14 @@
         {
             foreach (var file in Directory.GetFiles(GetTestFileSubFolder(), filePattern))
             {
-                File.Delete(file);
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError($"Failed to delete file '{file}', err: {e}");
+                }
             }
         }
 
@@ -81,8 +110,19 @@
                     File.WriteAllText(filePath, TEST_FILE_CONTENT);
                 }
             }
-
         }
 
+        public string[] GetFileLines(string filePath)
+        {
+            try
+            {
+                return File.ReadAllLines(filePath);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError($"Failed to get file lines. {e}");
+            }
+            return null;
+        }
     }
 }
