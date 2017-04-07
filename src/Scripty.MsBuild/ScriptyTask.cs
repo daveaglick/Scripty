@@ -190,7 +190,7 @@ namespace Scripty.MsBuild
 
             args = new List<string>();
 
-            if (!string.IsNullOrEmpty(SolutionFilePath))
+            if (!string.IsNullOrEmpty(SolutionFilePath) && !SolutionFilePath.Contains("*Undefined*"))
             {
                 args.Add($"--solution \"{SolutionFilePath}\"");
             }
