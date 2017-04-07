@@ -47,7 +47,7 @@ namespace Scripty
                         inputThread.Start();
 
                         // Timeout expired?
-                        if (!gotInput.WaitOne(100))
+                        if (!gotInput.WaitOne(250))
                         {
                             inputThread.Abort();
                             break;
@@ -62,6 +62,9 @@ namespace Scripty
                         // Got data
                         stdin.Append(Console.InputEncoding.GetString(buffer, 0, read));
                     }
+
+                    // Didn't get to the end of stream, but let's return what we've got
+                    return stdin.ToString();
                 }
             }
 

@@ -62,6 +62,10 @@ namespace Scripty
         public void ReadStdin()
         {
             string stdin = StandardInputReader.Read();
+            if (string.IsNullOrWhiteSpace(stdin))
+            {
+                throw new InvalidOperationException("Could not get settings from stdin.");
+            }
             JsonConvert.PopulateObject(stdin, this);
         }
     }
