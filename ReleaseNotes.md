@@ -1,3 +1,10 @@
+# 0.7.2
+
+- [Fix] Removed the System.IO.FileSystem.Primitives dependency from the MSBuild task (#84)
+- [Fix] Adds a check for undefined solution paths (#81)
+- [Fix] Passes data from MSBuild task to Scripty via stdin instead of CLI (#80, #87)
+- [Fix] MSBuild task now fails the build if Scripty fails (#37)
+
 # 0.7.1
 
 - [Fix] Fix for binding redirects in NuGet package

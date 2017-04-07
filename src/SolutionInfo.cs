@@ -6,8 +6,8 @@
 using System.Reflection;
 
 [assembly: AssemblyProduct("Scripty")]
-[assembly: AssemblyVersion("0.7.1")]
-[assembly: AssemblyFileVersion("0.7.1")]
-[assembly: AssemblyInformationalVersion("0.7.1")]
+[assembly: AssemblyVersion("0.7.2")]
+[assembly: AssemblyFileVersion("0.7.2")]
+[assembly: AssemblyInformationalVersion("0.7.2")]
 [assembly: AssemblyCopyright("Copyright © Scripty Contributors")]
 
