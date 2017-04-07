@@ -37,19 +37,27 @@ namespace Scripty
 
         private int Run(string[] args)
         {
-            // Parse the command line
-            try
+            // Parse the command line if there are args
+            if (args.Length > 0)
             {
-                bool hasParseArgsErrors;
-                if (!_settings.ParseArgs(args, out hasParseArgsErrors))
+                try
                 {
-                    return hasParseArgsErrors ? (int)ExitCode.CommandLineError : (int)ExitCode.Normal;
+                    bool hasParseArgsErrors;
+                    if (!_settings.ParseArgs(args, out hasParseArgsErrors))
+                    {
+                        return hasParseArgsErrors ? (int) ExitCode.CommandLineError : (int) ExitCode.Normal;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex.ToString());
+                    return (int) ExitCode.CommandLineError;
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Console.Error.WriteLine(ex.ToString());
-                return (int)ExitCode.CommandLineError;
+                // Otherwise the settings should come in over stdin
+                _settings.ReadStdin();
             }
 
             // Attach
@@ -74,14 +82,13 @@ namespace Scripty
             // Get the script engine
             string solutionFilePath = null;
             string projectFilePath = Path.Combine(Environment.CurrentDirectory, _settings.ProjectFilePath);
-            ScriptEngine engine;
 
             if (_settings.SolutionFilePath != null)
             {
                 solutionFilePath = Path.Combine(Environment.CurrentDirectory, _settings.SolutionFilePath);
             }
 
-            engine = new ScriptEngine(projectFilePath, solutionFilePath, _settings.Properties);
+            ScriptEngine engine = new ScriptEngine(projectFilePath, solutionFilePath, _settings.Properties);
 
             // Get script files if none were specified
             IReadOnlyList<string> finalScriptFilePaths;

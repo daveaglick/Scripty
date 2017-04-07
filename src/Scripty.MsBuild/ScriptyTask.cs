@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Newtonsoft.Json;
 
 namespace Scripty.MsBuild
 {
@@ -74,29 +75,26 @@ namespace Scripty.MsBuild
             // it uses MSBuild to figure out what the project contains and MSBuild only supports
             // one build per process
             Log.LogMessage("Starting out-of-process script evaluation...");
-
-            // Get the arguments. If this fails to construct 
-            // them, it will log an error and return null.
-            string arguments = CreateScriptyArguments();
-
-            if (arguments == null)
-            {
-                return false;
-            }
-
-            Log.LogMessage("Arguments: " + arguments);
             List<string> outputData = new List<string>();
             List<string> errorData = new List<string>();
             Process process = new Process();
             process.StartInfo.FileName = ScriptyExecutable;
-            process.StartInfo.Arguments = arguments;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardInput = true;
             process.OutputDataReceived += (s, e) => outputData.Add(e.Data);
             process.ErrorDataReceived += (s, e) => errorData.Add(e.Data);
             process.Start();
+
+            // Create and send the settings
+            string settingsJson = GetSettingsJson();
+            process.StandardInput.Write(settingsJson);
+            process.StandardInput.Flush();
+            process.StandardInput.Close();
+
+            // Wait for the process to exit
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             process.WaitForExit();
@@ -113,6 +111,7 @@ namespace Scripty.MsBuild
             foreach (string error in errorData.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
                 Log.LogError(error);
+                return false;
             }
 
             // Add the compile files
@@ -170,51 +169,26 @@ namespace Scripty.MsBuild
                     return taskItem;
                 }));
 
-            return true;
+            return !Log.HasLoggedErrors;
         }
 
-        private string CreateScriptyArguments()
+        private string GetSettingsJson()
         {
-            IEnumerable<KeyValuePair<string, string>> properties;
-            List<string> args;
-
-
-            // Get the properties. This will log an error 
-            // and return null if they cannot be found.
-            properties = GetMsBuildProperties();
-
-            if (properties == null)
+            Settings settings = new Settings
             {
-                return null;
-            }
-
-            args = new List<string>();
-
-            if (!string.IsNullOrEmpty(SolutionFilePath) && !SolutionFilePath.Contains("*Undefined*"))
-            {
-                args.Add($"--solution \"{SolutionFilePath}\"");
-            }
-
-            foreach (var property in properties)
-            {
-                args.Add($"--p \"{property.Key}={property.Value}\"");
-            }
-
-            // The project file path is a parameter, so it needs 
-            // to go after all other options, but before the scripts.
-            args.Add($"\"{ProjectFilePath}\"");
-
-            // The script files are a parameter list, so they go last.
-            args.AddRange(ScriptFiles
-                .Select(x => x.GetMetadata("FullPath"))
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Distinct()
-                .Select(x => $"\"{x}\""));
-
-            return string.Join(" ", args);
+                ProjectFilePath = ProjectFilePath,
+                Properties = GetMsBuildProperties(),
+                ScriptFilePaths = ScriptFiles
+                    .Select(x => x.GetMetadata("FullPath"))
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Distinct()
+                    .ToList(),
+                SolutionFilePath = SolutionFilePath?.Contains("*Undefined*") == true ? null : SolutionFilePath
+            };
+            return JsonConvert.SerializeObject(settings);
         }
 
-        private IEnumerable<KeyValuePair<string, string>> GetMsBuildProperties()
+        private IDictionary<string, string> GetMsBuildProperties()
         {
             // We need to use reflection to get
             // the build properties out of MSBuild.
