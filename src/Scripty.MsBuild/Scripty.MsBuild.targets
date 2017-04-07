@@ -6,6 +6,10 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <ScriptyContinueOnError Condition=" '$(ScriptyContinueOnError)' == '' ">ErrorAndStop</ScriptyContinueOnError>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <EvaluateScriptyFiles Condition=" '$(EvaluateScriptyFiles)' == '' ">true</EvaluateScriptyFiles>
   </PropertyGroup>
   
@@ -24,7 +28,7 @@
   <UsingTask AssemblyFile="$(ScriptyAssembly)" TaskName="ScriptyTask" />
 
   <Target Name="EvaluateScriptyFiles" DependsOnTargets="_ResolveScriptyFiles" BeforeTargets="BeforeBuild">
-    <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" SolutionFilePath="$(SolutionPath)" ScriptyExecutable="$(ScriptyExecutable)" ScriptFiles="@(ScriptyFile)">
+    <ScriptyTask ProjectFilePath="$(MSBuildProjectFullPath)" SolutionFilePath="$(SolutionPath)" ScriptyExecutable="$(ScriptyExecutable)" ScriptFiles="@(ScriptyFile)" ContinueOnError="$(ScriptyContinueOnError)">
       <Output TaskParameter="NoneFiles" ItemName="NoneFiles" />
       <Output TaskParameter="CompileFiles" ItemName="CompileFiles" />
       <Output TaskParameter="ContentFiles" ItemName="ContentFiles" />

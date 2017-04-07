@@ -213,6 +213,14 @@ By default, all files in the project with the `.csx` extension are evaluated. Yo
 
 Files that get generated using the MsBuild task are included during compilation (as long as their `Compile` flag is set in the script), but not in the project (unless your script modifies the project to include them). If you'd like to have them in the project as well (for example, to enable Intellisense) just include them manually after the first generation. You may want to also commit an empty placeholder file to any shared repository if you do include generated files in the project so that people obtaining the project won't get a missing file prior to their first build.
 
+By default, the MSBuild task will cause the build to fail if there are any problems evaluating scripts. You can override this behavior and continue with the build on errors by placing the following in your project file:
+
+```
+<PropertyGroup>
+  <ScriptyContinueOnError>true</ScriptyContinueOnError>
+</PropertyGroup>
+```
+
 ## Scripty.CustomTool
 
 This library provides a single file generator (otherwise known as a custom tool) in Visual Studio that can be used to evaluate Scripty scripts whenever the underlying script file changes. Unlike `Scripty.MsBuild`, generated output from the scripts will get automatically included in the project. This library and `Scripty.MsBuild` can be used together to provide script evaluation on changes *and* on build.
