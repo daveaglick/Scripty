@@ -1,3 +1,9 @@
+# 0.7.3
+
+- [Feature] Adds option to continue on MSBuild task failures (#37)
+- [Fix] Adds assembly binding attributes to the Visual Studio extension (#89)
+- [Fix] No longer uses a timeout for reading stdin
+
 # 0.7.2
 
 - [Fix] Removed the System.IO.FileSystem.Primitives dependency from the MSBuild task (#84)
