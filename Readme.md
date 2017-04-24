@@ -248,7 +248,9 @@ This library is the foundation of Scripty and can be used if you want to embed S
 
 A Cake addin for Scripty that allows you to evaluate Scripty scripts in Cake. The recommended approach is to use the `Scripty.MsBuild` library so that you also get Scripty evaluation when building from Visual Studio, If you are calling MsBuild from Cake (which most Cake scripts do) this addin is not needed. However, this addin lets you integrate Scripty evaluation into Cake in situations when you want to completely replace MsBuild.
 
-When using the addin it is important to include both the addin and the Scripty tool. To use the addin call Scripty constructor and then chain the Evaluate method off it. The constructor takes an string for the project file and the Evaluate method takes a param list of script files to process. A simple Cake file would look like:
+When using the addin it is important to include both the addin and the Scripty tool. To use the addin call Scripty constructor and then chain the Evaluate method off it. 
+
+The constructor takes an string for the project file and an optional ScriptySettings which inherits from ToolSettings with no extra settings added. The Evaluate method takes a param list of script files to process. A simple Cake file would look like:
 
 ```csharp
 #addin nuget:?package=Cake.Scripty
@@ -258,7 +260,10 @@ var target = Argument("target", "Default");
 
 Task("Default")
 .Does(() => {
-    Scripty("Project.csproj")
+    Scripty("Project.csproj", new ScriptySettings()
+        {
+            WorkingDirectory = "./OptionalWorkingDirectory"
+        })
         .Evaluate("Script1.csx", "Script2.csx", "Script3.csx");
 });
 
