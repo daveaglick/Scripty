@@ -17,13 +17,14 @@ namespace Cake.Scripty
         /// </summary>
         /// <param name="context">The Cake context</param>
         /// <param name="projectFilePath">Path to the project file to use</param>
+        /// <param name="settings">The settings for the tool</param>
         /// <returns>A <see cref="ScriptyRunner"/> to evaluate scripts</returns>
         [CakeMethodAlias]
-        public static ScriptyRunner Scripty(this ICakeContext context, FilePath projectFilePath)
+        public static ScriptyRunner Scripty(this ICakeContext context, FilePath projectFilePath, ScriptySettings settings = null)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (context == null) throw new ArgumentNullException(nameof(projectFilePath));
-            return new ScriptyRunner(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools, projectFilePath);
+            return new ScriptyRunner(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools, projectFilePath, settings);
         }
     }
 }

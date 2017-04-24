@@ -15,12 +15,13 @@
             <code>#tool "nuget:?package=Scripty"</code>
             </summary>
         </member>
-        <member name="M:Cake.Scripty.ScriptyAliases.Scripty(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+        <member name="M:Cake.Scripty.ScriptyAliases.Scripty(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Scripty.ScriptySettings)">
             <summary>
             Gets a <see cref="T:Cake.Scripty.ScriptyRunner"/> to evaluate scripts for the given project
             </summary>
             <param name="context">The Cake context</param>
             <param name="projectFilePath">Path to the project file to use</param>
+            <param name="settings">The settings for the tool</param>
             <returns>A <see cref="T:Cake.Scripty.ScriptyRunner"/> to evaluate scripts</returns>
         </member>
         <member name="T:Cake.Scripty.ScriptyRunner">
@@ -28,7 +29,7 @@
             A runner for evaluating Scripty scripts in a project
             </summary>
         </member>
-        <member name="M:Cake.Scripty.ScriptyRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IProcessRunner,Cake.Core.Tooling.IToolLocator,Cake.Core.IO.FilePath)">
+        <member name="M:Cake.Scripty.ScriptyRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IProcessRunner,Cake.Core.Tooling.IToolLocator,Cake.Core.IO.FilePath,Cake.Scripty.ScriptySettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Cake.Scripty.ScriptyRunner"/> class
             </summary>
@@ -37,6 +38,13 @@
             <param name="processRunner">The process runner</param>
             <param name="tools">The tools</param>
             <param name="projectFilePath">Path to the project file</param>
+            <param name="settings">Settings for running the tool</param>
+        </member>
+        <member name="M:Cake.Scripty.ScriptyRunner.Evaluate(Cake.Core.IO.FilePath[])">
+            <summary>
+            Evaluates the given Scripty scripts
+            </summary>
+            <param name="scriptFiles">The script files to evaluate</param>
         </member>
         <member name="M:Cake.Scripty.ScriptyRunner.Evaluate(System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
             <summary>
@@ -44,11 +52,11 @@
             </summary>
             <param name="scriptFiles">The script files to evaluate</param>
         </member>
-        <member name="M:Cake.Scripty.ScriptyRunner.Evaluate(Cake.Core.IO.FilePath[])">
+        <member name="M:Cake.Scripty.ScriptyRunner.ScriptWorkingDirectory">
             <summary>
-            Evaluates the given Scripty scripts
+            Gets the working directory for where the scripts files are located
             </summary>
-            <param name="scriptFiles">The script files to evaluate</param>
+            <returns>The working directory</returns>
         </member>
         <member name="M:Cake.Scripty.ScriptyRunner.GetToolName">
             <summary>Gets the name of the tool.</summary>

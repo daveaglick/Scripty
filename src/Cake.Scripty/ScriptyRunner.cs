@@ -12,6 +12,12 @@ namespace Cake.Scripty
     /// </summary>
     public class ScriptyRunner : Tool<ScriptySettings>
     {
+        private ICakeEnvironment _environment { get; set; }
+
+        private ScriptySettings _settings { get; }
+
+        private FilePath _projectFilePath { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptyRunner"/> class
         /// </summary>
@@ -20,40 +26,20 @@ namespace Cake.Scripty
         /// <param name="processRunner">The process runner</param>
         /// <param name="tools">The tools</param>
         /// <param name="projectFilePath">Path to the project file</param>
-        public ScriptyRunner(IFileSystem fileSystem, ICakeEnvironment environment, IProcessRunner processRunner,
-            IToolLocator tools, FilePath projectFilePath)
+        /// <param name="settings">Settings for running the tool</param>
+        public ScriptyRunner(
+            IFileSystem fileSystem, 
+            ICakeEnvironment environment, 
+            IProcessRunner processRunner,
+            IToolLocator tools, 
+            FilePath projectFilePath, 
+            ScriptySettings settings
+        )
             : base(fileSystem, environment, processRunner, tools)
         {
-            if (projectFilePath == null) throw new ArgumentNullException(nameof(projectFilePath));
-            ProjectFilePath = projectFilePath;
-            Environment = environment;
-        }
-
-        private ICakeEnvironment Environment { get; set; }
-
-        private FilePath ProjectFilePath { get; set; }
-
-        private ScriptySettings Settings { get; set; } = new ScriptySettings();
-
-        /// <summary>
-        /// Evaluates the given Scripty scripts
-        /// </summary>
-        /// <param name="scriptFiles">The script files to evaluate</param>
-        public void Evaluate(IEnumerable<FilePath> scriptFiles)
-        {
-            var filePaths = scriptFiles as IList<FilePath> ?? scriptFiles.ToList();
-            if (!filePaths.Any())
-            {
-                throw new ArgumentException("No files provided to evaluate", nameof(scriptFiles));
-            }
-            var args = new ProcessArgumentBuilder();
-            args.AppendQuoted(ProjectFilePath.MakeAbsolute(Environment).FullPath);
-            foreach (var scriptFile in filePaths)
-            {
-                var path = ProjectFilePath.MakeAbsolute(Environment).GetRelativePath(scriptFile.MakeAbsolute(Environment)).FullPath;
-                args.AppendQuoted(path);
-            }
-            Run(Settings, args);
+            _environment = environment;
+            _projectFilePath = projectFilePath ?? throw new ArgumentNullException(nameof(projectFilePath));
+            _settings = settings ?? new ScriptySettings();
         }
 
         /// <summary>
@@ -63,6 +49,51 @@ namespace Cake.Scripty
         public void Evaluate(params FilePath[] scriptFiles)
         {
             Evaluate(scriptFiles.AsEnumerable());
+        }
+
+        /// <summary>
+        /// Evaluates the given Scripty scripts
+        /// </summary>
+        /// <param name="scriptFiles">The script files to evaluate</param>
+        public void Evaluate(IEnumerable<FilePath> scriptFiles)
+        {
+            if (scriptFiles.Any() == false)
+            {
+                throw new ArgumentException("No files provided to evaluate", nameof(scriptFiles));
+            }
+
+            var scriptWorkingDirectory = ScriptWorkingDirectory();
+            var absoluteProjectPath = _projectFilePath.MakeAbsolute(scriptWorkingDirectory);
+
+            var args = new ProcessArgumentBuilder();
+            args.AppendQuoted(absoluteProjectPath.FullPath);
+            foreach (var scriptFile in scriptFiles)
+            {
+                var path = absoluteProjectPath.GetRelativePath(scriptFile.MakeAbsolute(scriptWorkingDirectory)).FullPath;
+                args.AppendQuoted(path);
+            }
+
+            Run(_settings, args);
+        }
+
+        /// <summary>
+        /// Gets the working directory for where the scripts files are located
+        /// </summary>
+        /// <returns>The working directory</returns>
+        private DirectoryPath ScriptWorkingDirectory()
+        {
+            if (_settings.WorkingDirectory == null)
+            {
+                return _environment.WorkingDirectory;
+            }
+            else if (_settings.WorkingDirectory.IsRelative)
+            {
+                return _settings.WorkingDirectory.MakeAbsolute(_environment.WorkingDirectory);
+            }
+            else
+            {
+                return _settings.WorkingDirectory;
+            }
         }
 
         /// <summary>Gets the name of the tool.</summary>
