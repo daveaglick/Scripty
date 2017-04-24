@@ -12,8 +12,5 @@
     <description>A simple Cake addin for invoking Scripty to run Roslyn-powered C# scripts for code generation.</description>
     <copyright>Copyright 2016</copyright>
     <tags>T4 MSBuild Scripting Roslyn CodeGeneration CodeGen Cake Build</tags>
-    <dependencies>
-        <!-- <dependency id="Scripty" version="$version$" /> -->
-    </dependencies>
   </metadata>
 </package>
