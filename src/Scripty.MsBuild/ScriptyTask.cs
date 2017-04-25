@@ -225,7 +225,7 @@ namespace Scripty.MsBuild
             }
             catch (Exception ex)
             {
-                Log.LogError("Could not get global properties from MSBuild: " + ex.Message);
+                Log.LogWarning("Could not get global properties from MSBuild: " + ex.Message);
                 return null;
             }
         }
