@@ -206,6 +206,8 @@ namespace Scripty.Core.Output
             set { _textWriter.NewLine = value; }
         }
 
+        public override string ProjectName { get; set; }
+
         public override void Close() => _textWriter.Close();
 
         public override void Flush() => _textWriter.Flush();
