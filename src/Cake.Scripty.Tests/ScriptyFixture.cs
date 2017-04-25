@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cake.Core.IO;
+﻿using Cake.Core.IO;
 using Cake.Testing.Fixtures;
+using System;
 
 namespace Cake.Scripty.Tests
 {
@@ -24,7 +20,7 @@ namespace Cake.Scripty.Tests
 
         protected override void RunTool()
         {
-            var runner = new ScriptyRunner(FileSystem, Environment, ProcessRunner, Tools, ProjectFilePath);
+            var runner = new ScriptyRunner(FileSystem, Environment, ProcessRunner, Tools, ProjectFilePath, new ScriptySettings());
             RunAction?.Invoke(runner);
         }
 

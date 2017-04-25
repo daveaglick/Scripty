@@ -44,7 +44,7 @@ The following global properties are available when evaluating your script with S
 
   This is a reference to the global `ScriptContext` class that holds each of the properties described below. You can use it to pass into a method that needs access to the full context. To put it another way, this property holds a class that contains all of the global properties in one object. This can be useful because classes and methods in the script are "lifted" and don't have access to the same global properties unscoped code does.
 
-  ```
+  ```csharp
   WritePaths(Context);
 
   public void WritePaths(ScriptContext context)
@@ -70,7 +70,7 @@ The following global properties are available when evaluating your script with S
 
     A Roslyn [`Microsoft.CodeAnalysis.Project`](http://source.roslyn.io/#Microsoft.CodeAnalysis.Workspaces/Workspace/Solution/Project.cs) that represents the current project. You can use this to access the files in the project as well as other information, including getting the compilation for the project. For example, this script will output comments with the path of each source file in the project:
 
-    ```
+    ```csharp
     using Microsoft.CodeAnalysis;
 
     foreach(Document document in Project.Analysis.Documents)
@@ -85,7 +85,7 @@ The following global properties are available when evaluating your script with S
 
     A `Microsoft.Build.Evaluation.Project`. This API and the Roslyn Workspaces API exposed in the `Analysis` property have overlapping functionality, but are also complementary. While the Roslyn Workspaces API is more focused on the compilation, the MSBuild API is more focused on the makeup of the project file. Similar to the example for the Roslyn API, this script will output comments with the path of each source file in the project using the MSBuild API:
 
-    ```
+    ```csharp
     using Microsoft.Build.Evaluation;
 
     foreach(ProjectItem item in Project.Build.Items.Where(x => x.ItemType == "Compile"))
@@ -118,7 +118,7 @@ The following global properties are available when evaluating your script with S
 
   A thin wrapper around `TextWriter` that should be used to output generated content. Using this object instead of direct file writing mechanisms ensures that Scripty can keep track of which files were generated and pass that information back to the build process as needed. By default, a file with the same name as the script but with a `.cs` extension is output. A handy pattern is to use script interpolation along with verbatim strings to output large chunks of code at once: 
 
-  ```
+  ```csharp
   string propertyName = "Bar";
   Output.WriteLine($@"
   class Foo 
@@ -129,7 +129,7 @@ The following global properties are available when evaluating your script with S
 
   Given the above script named `script.csx`, the following generated code will be output to `script.cs`:
 
-  ```
+  ```csharp
   class Foo
   {
     int Bar => 42;
@@ -138,7 +138,7 @@ The following global properties are available when evaluating your script with S
 
   You can output more than one file by using the `Output` indexer.
 
-  ```
+  ```csharp
   Output["other.cs"].WriteLine("// Another file");
   ```
 
@@ -158,7 +158,7 @@ The following global properties are available when evaluating your script with S
 
     You can also control the build action for the generated file using the `BuildAction` property. By default, any output file that ends in `.cs` is compiled and all others are included in the project but not compiled (I.e., a build action of "None"). The `BuildAction` property takes the following enum:
 
-    ```
+    ```csharp
     public enum BuildAction
     {
       /// <summary>
@@ -190,7 +190,7 @@ The following global properties are available when evaluating your script with S
 
     For example, to set the build action for the default generated file and an alternate generated file you would write:
 
-    ```
+    ```csharp
     Output.BuildAction = BuildAction.None;
     Output["embedded.xml"].BuildAction = BuildAction.EmbeddedResource;
     ```
@@ -203,11 +203,11 @@ Scripty support is provided via a variety of libraries (and corresponding NuGet 
 
 This installs an MsBuild task into your project that will evaluate script files on each build.
 
-By default, all files in the project with the `.csx` extension are evaluated. You can customize this with the `ScriptFiles` `ItemGroup` (for example, if you have `.csx` files that aren't part of code generation or that you intend to load with `#load` and thus shouldn't be evaluated directly):
+By default, all files in the project with the `.csx` extension are evaluated. You can customize this with the `ScriptyFiles` `ItemGroup` (for example, if you have `.csx` files that aren't part of code generation or that you intend to load with `#load` and thus shouldn't be evaluated directly):
 
-```
+```xml
 <ItemGroup>
-    <ScriptFiles Include="codegen.csx" />
+    <ScriptyFiles Include="codegen.csx" />
 </ItemGroup>
 ```
 
@@ -215,7 +215,7 @@ Files that get generated using the MsBuild task are included during compilation 
 
 By default, the MSBuild task will cause the build to fail if there are any problems evaluating scripts. You can override this behavior and continue with the build on errors by placing the following in your project file:
 
-```
+```xml
 <PropertyGroup>
   <ScriptyContinueOnError>true</ScriptyContinueOnError>
 </PropertyGroup>
@@ -244,9 +244,31 @@ usage:  <ProjectFilePath> <ScriptFilePaths>...
 
 This library is the foundation of Scripty and can be used if you want to embed Scripty evaluation. It lets you run the Scripty engine directly, supplying any data needed to set up the special global properties like the current project path.
 
-## Cake.Scripty (Planned)
+## Cake.Scripty
 
-A Cake addin for Scripty that allows you to evaluate Scripty scripts in Cake. Note that the recommended approach is to use the `Scripty.MsBuild` library so that you also get Scripty evaluation when building from Visual Studio, in which case this addin isn't needed if you're calling MsBuild from Cake (which most Cake scripts do). However, this addin lets you integrate Scripty evaluation into Cake in situations when you want to completely replace MsBuild.
+A Cake addin for Scripty that allows you to evaluate Scripty scripts in Cake. The recommended approach is to use the `Scripty.MsBuild` library so that you also get Scripty evaluation when building from Visual Studio, If you are calling MsBuild from Cake (which most Cake scripts do) this addin is not needed. However, this addin lets you integrate Scripty evaluation into Cake in situations when you want to completely replace MsBuild.
+
+When using the addin it is important to include both the addin and the Scripty tool. To use the addin call Scripty constructor and then chain the Evaluate method off it. 
+
+The constructor takes an string for the project file and an optional ScriptySettings which inherits from ToolSettings with no extra settings added. The Evaluate method takes a param list of script files to process. A simple Cake file would look like:
+
+```csharp
+#addin nuget:?package=Cake.Scripty
+#tool nuget:?package=Scripty
+
+var target = Argument("target", "Default");
+
+Task("Default")
+.Does(() => {
+    Scripty("Project.csproj", new ScriptySettings()
+        {
+            WorkingDirectory = "./OptionalWorkingDirectory"
+        })
+        .Evaluate("Script1.csx", "Script2.csx", "Script3.csx");
+});
+
+RunTarget(target);
+```
 
 # Help!
 
