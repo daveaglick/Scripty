@@ -1,3 +1,10 @@
+# 0.7.4
+
+- [Fix] Fixed Cake addin target version (#95, thanks @crash-dive)
+- [Fix] Removed Newtonsoft.Json as package dependency from MSBuild task (#96)
+- [Fix] Tweaked Visual Studio dependencies for VSIX package to work on older Visual Studio versions (#93)
+- [Fix] Changed build property failures to a warning for better Mono support (#92)
+
 # 0.7.3
 
 - [Feature] Adds option to continue on MSBuild task failures (#37)
