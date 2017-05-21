@@ -49,6 +49,11 @@ namespace Scripty.Core.Output
             }
         }
 
+        /// <summary>
+        /// Obtains a reference to an output file, additionaly creating it if necessary
+        /// </summary>
+        /// <param name="filePath">The name and path of the output file. Eg "MyGeneratedFile.cs" </param>
+        /// <returns>An OutputFile file object</returns>
         public OutputFile this[string filePath]
         {
             get
@@ -62,7 +67,7 @@ namespace Scripty.Core.Output
                     throw new ArgumentException("Value cannot be null or empty", nameof(filePath));
                 }
 
-                filePath = Path.Combine(Path.GetDirectoryName(_scriptFilePath), filePath);
+                filePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(_scriptFilePath), filePath));
                 OutputFileWriter outputFile;
                 if (!_outputFiles.TryGetValue(filePath, out outputFile))
                 {
