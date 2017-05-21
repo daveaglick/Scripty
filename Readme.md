@@ -16,6 +16,8 @@ I'd recommend looking at the [Scripty Visual Studio extension](https://visualstu
 
 Scripty scripts are just [standard Roslyn C# scripts](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples) with some special global properties to make them suitable for powering code generation. All the standard C# scripting conventions still apply such as using the `#r` preprocessor directive to load assemblies and the  `#load` directive to load external script files. They are also generally given `.csx` extensions just like normal C# scripts. This makes it easy to bootstrap evaluating them outside Scripty if you need to, providing whichever Scripty globals you use in the script yourself.
 
+It is now also possible to use the `#load` directive to load c# files (.cs). This makes it convenient to use intellisense when writing files to be used by Scripty. An example of this usage can be seen below.
+
 The following references are added to every script by default:
 * `Microsoft.CodeAnalysis.Workspaces`
 * `Microsoft.Build`
@@ -65,7 +67,7 @@ The following global properties are available when evaluating your script with S
 * `Project`
 
   A leaky abstraction over both the MSBuild API and the Roslyn Workspaces API. This object allows you to traverse a hierarchical model of the project, providing access to the MSBuild `ProjectItem` and Roslyn `Document` for any item. This property is a `ProjectRoot` that exposes other `ProjectNode` objects by implementing `IReadOnlyDictionary<string, ProjectNode>` (or you can also access child nodes via the `Children` property).
- 
+
   * `Analysis`
 
     A Roslyn [`Microsoft.CodeAnalysis.Project`](http://source.roslyn.io/#Microsoft.CodeAnalysis.Workspaces/Workspace/Solution/Project.cs) that represents the current project. You can use this to access the files in the project as well as other information, including getting the compilation for the project. For example, this script will output comments with the path of each source file in the project:
@@ -116,14 +118,14 @@ The following global properties are available when evaluating your script with S
 
 * `Output`
 
-  A thin wrapper around `TextWriter` that should be used to output generated content. Using this object instead of direct file writing mechanisms ensures that Scripty can keep track of which files were generated and pass that information back to the build process as needed. By default, a file with the same name as the script but with a `.cs` extension is output. A handy pattern is to use script interpolation along with verbatim strings to output large chunks of code at once: 
+  A thin wrapper around `TextWriter` that should be used to output generated content. Using this object instead of direct file writing mechanisms ensures that Scripty can keep track of which files were generated and pass that information back to the build process as needed. By default, a file with the same name as the script but with a `.cs` extension is output. A handy pattern is to use script interpolation along with verbatim strings to output large chunks of code at once:
 
   ```csharp
   string propertyName = "Bar";
   Output.WriteLine($@"
-  class Foo 
-  {{ 
-    int {propertyName} => 42; 
+  class Foo
+  {{
+    int {propertyName} => 42;
   }}");
   ```
 
@@ -248,7 +250,7 @@ This library is the foundation of Scripty and can be used if you want to embed S
 
 A Cake addin for Scripty that allows you to evaluate Scripty scripts in Cake. The recommended approach is to use the `Scripty.MsBuild` library so that you also get Scripty evaluation when building from Visual Studio, If you are calling MsBuild from Cake (which most Cake scripts do) this addin is not needed. However, this addin lets you integrate Scripty evaluation into Cake in situations when you want to completely replace MsBuild.
 
-When using the addin it is important to include both the addin and the Scripty tool. To use the addin call Scripty constructor and then chain the Evaluate method off it. 
+When using the addin it is important to include both the addin and the Scripty tool. To use the addin call Scripty constructor and then chain the Evaluate method off it.
 
 The constructor takes an string for the project file and an optional ScriptySettings which inherits from ToolSettings with no extra settings added. The Evaluate method takes a param list of script files to process. A simple Cake file would look like:
 
@@ -269,6 +271,104 @@ Task("Default")
 
 RunTarget(target);
 ```
+
+# Sample Usage:
+Within a Solution and given a script file (TestScript.csx)
+
+```csharp
+//TestScript.csx
+#load "TestCSharpFile.csx.cs"
+var sc = new ScriptContainer(Context);
+await sc.OutputProjectStructure();
+```
+
+And c# file (TestCSharpFile.csx.cs). The .cs extension is critical
+
+```csharp
+//TestCSharpFile.csx.cs
+using Microsoft.CodeAnalysis;
+using Scripty.Core;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace ScriptContainer
+{
+    public class ScriptContainer
+    {
+        private readonly string _documentStructureFile;
+        private readonly string _descriptionFile;
+        private readonly ScriptContext _context;
+
+        public ScriptContainer(ScriptContext context)
+        {
+            _documentStructureFile = "GeneratedFile.cs";
+            _descriptionFile = "Description.txt";
+            _context = context;
+        }
+
+        public async Task OutputProjectStructure()
+        {
+            _context.Output[_descriptionFile].BuildAction = Scripty.Core.Output.BuildAction.GenerateOnly;
+            _context.Output[_documentStructureFile].BuildAction = Scripty.Core.Output.BuildAction.Compile;
+            _context.Output[_descriptionFile].WriteLine($"I am a text file generated by a scripty template");
+
+            var task = Task.Run(async () =>
+            {
+                return await _context.Project.Analysis.GetCompilationAsync();
+            });
+            var c = task.Result;
+
+            //Get NameSpace tp Enumerate / process
+            var zAddressNamespaceSymbol = c.GlobalNamespace.GetNamespaceMembers().Single(ns => ns.Name == "MyRootNameSpace");
+
+            RecurseCompilationSymbol(zAddressNamespaceSymbol, 1);
+        }
+
+        public void RecurseCompilationSymbol(ISymbol compilationSymbol, int level)
+        {
+            level++;
+            if (compilationSymbol is INamespaceOrTypeSymbol)
+            {
+                WriteDetailLine(level, compilationSymbol.Kind, compilationSymbol.Name, "");
+                foreach (var member in ((INamespaceOrTypeSymbol)compilationSymbol).GetMembers())
+                {
+                    RecurseCompilationSymbol(member, level);
+                }
+            }
+            else if (compilationSymbol is IPropertySymbol)
+            {
+                WriteDetailLine(level, compilationSymbol.Kind, compilationSymbol.Name,
+                    ((IPropertySymbol) compilationSymbol).GetMethod.ReturnType.Name);
+            }
+            else
+            {
+                WriteDetailLine(level, compilationSymbol.Kind, compilationSymbol.Name,"");
+            }
+        }
+
+        private void WriteDetailLine(int level, SymbolKind symbolKind, string symbolName, string symbolReturnType)
+        {
+            var symbolKindName = Enum.GetName(typeof(SymbolKind), symbolKind);
+
+            _context.Output[_documentStructureFile].WriteLine($"// {GetStringOfSpaces(level)} {symbolKindName} {symbolName} {symbolReturnType}");
+        }
+
+        public static string GetStringOfSpaces(int number)
+        {
+            number = number * 4;
+            string s = "";
+            for (int i = 0; i < number; i++)
+            {
+                s = s + " ";
+            }
+            return s;
+        }    
+    }
+}
+
+```
+We would have an output of 2 files. Namely  "DescriptionText.txt" which will contain the text specified, and "GeneratedFile.cs" which will contain a listing of all namespaces, classes and their properties and methods.
 
 # Help!
 
