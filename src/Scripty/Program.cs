@@ -88,7 +88,8 @@ namespace Scripty
                 solutionFilePath = Path.Combine(Environment.CurrentDirectory, _settings.SolutionFilePath);
             }
 
-            ScriptEngine engine = new ScriptEngine(projectFilePath, solutionFilePath, _settings.Properties);
+            ScriptEngine engine = new ScriptEngine(projectFilePath, solutionFilePath,
+							_settings.Properties, _settings.CustomProperties);
 
             // Get script files if none were specified
             IReadOnlyList<string> finalScriptFilePaths;

@@ -21,11 +21,13 @@ namespace Scripty.Core
         private readonly string _projectFilePath;
 
         public ScriptEngine(string projectFilePath)
-            : this(projectFilePath, null, null)
+            : this(projectFilePath, null, null, null)
         {
         }
 
-        public ScriptEngine(string projectFilePath, string solutionFilePath, IReadOnlyDictionary<string, string> properties)
+        public ScriptEngine(string projectFilePath, string solutionFilePath, 
+					IReadOnlyDictionary<string, string> properties,
+					IReadOnlyDictionary<string, string> customProperties = null)
         {
             if (string.IsNullOrEmpty(projectFilePath))
             {
@@ -47,7 +49,7 @@ namespace Scripty.Core
             }
 
             _projectFilePath = projectFilePath;
-            ProjectRoot = new ProjectRoot(projectFilePath, solutionFilePath, properties);
+            ProjectRoot = new ProjectRoot(projectFilePath, solutionFilePath, properties, customProperties);
         }
 
         public ProjectRoot ProjectRoot { get; }

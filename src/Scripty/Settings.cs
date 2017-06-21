@@ -13,7 +13,8 @@ namespace Scripty
         public string SolutionFilePath = null;
         public IReadOnlyList<string> ScriptFilePaths = null;
         public IReadOnlyDictionary<string, string> Properties = null;
-        public bool Attach = false;
+		public IReadOnlyDictionary<string, string> CustomProperties = null;
+		public bool Attach = false;
 
         private IReadOnlyList<KeyValuePair<string, string>> _properties = null;
 
