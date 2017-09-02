@@ -212,7 +212,7 @@
         private static void AssertThereAreNoErrors(ScriptResult result)
         {
             Assert.IsNotNull(result);
-            Assert.IsTrue(result.Errors.Count == 0, string.Join(Environment.NewLine, result.Errors.Select(e => $"{e.Line} {e.Column} {e.Message}")));
+            Assert.IsTrue(result.Messages.Count == 0, string.Join(Environment.NewLine, result.Messages.Select(e => $"{e.Line} {e.Column} {e.Message}")));
         }
 
         private static bool HasScriptedTestContent(string line)

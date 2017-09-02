@@ -107,10 +107,31 @@ namespace Scripty.MsBuild
                 Log.LogError("Got non-zero exit code from script evaluation: " + process.ExitCode);
             }
 
+            var messages = errorData.Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Split(new[] { '|' }, 2))
+                .Where(x => x.Length == 2)
+                .Select(x => new { MessageType = (MessageType)Enum.Parse(typeof(MessageType), x[0]), Message = x[1] })
+                .ToArray();
+
             // Report any errors
-            foreach (string error in errorData.Where(x => !string.IsNullOrWhiteSpace(x)))
+            foreach (var message in messages)
             {
-                Log.LogError(error);
+                switch (message.MessageType)
+                {
+                    case MessageType.Info:
+                        Log.LogMessage(message.Message);
+                        break;
+                    case MessageType.Warning:
+                        Log.LogWarning(message.Message);
+                        break;
+                    case MessageType.Error:
+                        Log.LogError(message.Message);
+                        break;
+                }
+            }
+
+            if (messages.Where(m => m.MessageType == MessageType.Error).Any())
+            {
                 return false;
             }
 
@@ -176,6 +197,7 @@ namespace Scripty.MsBuild
         {
             Settings settings = new Settings
             {
+                MessagesEnabled = true,
                 ProjectFilePath = ProjectFilePath,
                 Properties = GetMsBuildProperties(),
                 ScriptFilePaths = ScriptFiles

@@ -14,6 +14,7 @@ namespace Scripty
         public IReadOnlyList<string> ScriptFilePaths = null;
         public IReadOnlyDictionary<string, string> Properties = null;
         public bool Attach = false;
+        public bool MessagesEnabled = false;
 
         private IReadOnlyList<KeyValuePair<string, string>> _properties = null;
 
@@ -21,6 +22,7 @@ namespace Scripty
         {
             System.CommandLine.ArgumentSyntax parsed = System.CommandLine.ArgumentSyntax.Parse(args, syntax =>
             {
+                syntax.DefineOption("enableMessages", ref MessagesEnabled, "Enables passing of information and warnings to MsBuild.");
                 syntax.DefineOption("attach", ref Attach, "Pause execution at the start of the program until a debugger is attached.");
                 syntax.DefineOption("solution", ref SolutionFilePath, "The full path of the solution file that contains the project.");
                 syntax.DefineOptionList("p", ref _properties, ParseProperty, "The build properties.");

@@ -17,18 +17,30 @@ namespace Scripty
     {
         private static int Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionEvent;
             Program program = new Program();
+            AppDomain.CurrentDomain.UnhandledException += program.UnhandledExceptionEvent;
             return program.Run(args);
         }
 
-        private static void UnhandledExceptionEvent(object sender, UnhandledExceptionEventArgs e)
+        private void WriteMessage(MessageType type, string message)
+        {
+            if (_settings.MessagesEnabled)
+            {
+                Console.Error.WriteLine(string.Format("{0}|{1}", type, message));
+            }
+            else if (type == MessageType.Error)
+            {
+                Console.Error.WriteLine(message);
+            }
+        }
+
+        private void UnhandledExceptionEvent(object sender, UnhandledExceptionEventArgs e)
         {
             // Exit with a error exit code
             Exception exception = e.ExceptionObject as Exception;
             if (exception != null)
             {
-                Console.Error.WriteLine(exception.ToString());
+                WriteMessage(MessageType.Error, exception.ToString());
             }
             Environment.Exit((int) ExitCode.UnhandledError);
         }
@@ -50,7 +62,7 @@ namespace Scripty
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine(ex.ToString());
+                    WriteMessage(MessageType.Error, ex.ToString());
                     return (int) ExitCode.CommandLineError;
                 }
             }
@@ -129,7 +141,7 @@ namespace Scripty
             {
                 foreach (Exception ex in aggregateException.InnerExceptions)
                 {
-                    Console.Error.WriteLine(ex.ToString());
+                    WriteMessage(MessageType.Error, ex.ToString());
                 }
             }
 
@@ -137,9 +149,9 @@ namespace Scripty
             foreach (Task<ScriptResult> task in tasks.Where(x => x.Status == TaskStatus.RanToCompletion))
             {
                 // Check for any errors
-                foreach (ScriptError error in task.Result.Errors)
+                foreach (ScriptMessage message in task.Result.Messages)
                 {
-                    Console.Error.WriteLine($"{error.Message} [{error.Line},{error.Column}]");
+                    WriteMessage(message.MessageType, $"{message.Message} [{message.Line},{message.Column}]");
                 }
 
                 // Output the set of generated files w/ build actions

@@ -7,17 +7,17 @@ namespace Scripty.Core
     public class ScriptResult
     {
         public ICollection<IOutputFileInfo> OutputFiles { get; }
-        public ICollection<ScriptError> Errors { get; }
+        public ICollection<ScriptMessage> Messages { get; }
 
         internal ScriptResult(ICollection<IOutputFileInfo> outputFiles)
-            : this(outputFiles, Array.Empty<ScriptError>())
+            : this(outputFiles, Array.Empty<ScriptMessage>())
         {
         }
 
-        internal ScriptResult(ICollection<IOutputFileInfo> outputFiles, ICollection<ScriptError> errors)
+        internal ScriptResult(ICollection<IOutputFileInfo> outputFiles, ICollection<ScriptMessage> errors)
         {
             OutputFiles = outputFiles;
-            Errors = errors;
+            Messages = errors;
         }
     }
 }
