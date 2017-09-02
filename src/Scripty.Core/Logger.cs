@@ -13,7 +13,7 @@ namespace Scripty.Core
 
         public void Info(string message, int line = 0, int column = 0)
         {
-            Message(MessageType.Error, message, line, column);
+            Message(MessageType.Info, message, line, column);
         }
 
         public void Warning(string message, int line = 0, int column = 0)

@@ -148,10 +148,17 @@ namespace Scripty
             // Iterate over the completed tasks
             foreach (Task<ScriptResult> task in tasks.Where(x => x.Status == TaskStatus.RanToCompletion))
             {
-                // Check for any errors
+                // Check for any mesages.
                 foreach (ScriptMessage message in task.Result.Messages)
                 {
-                    WriteMessage(message.MessageType, $"{message.Message} [{message.Line},{message.Column}]");
+                    if (message.Line == 0 || message.Column == 0)
+                    {
+                        WriteMessage(message.MessageType, message.Message);
+                    }
+                    else
+                    {
+                        WriteMessage(message.MessageType, $"{message.Message} [{message.Line},{message.Column}]");
+                    }
                 }
 
                 // Output the set of generated files w/ build actions

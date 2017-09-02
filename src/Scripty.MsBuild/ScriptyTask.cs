@@ -98,15 +98,7 @@ namespace Scripty.MsBuild
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             process.WaitForExit();
-            if (process.ExitCode == 0)
-            {
-                Log.LogMessage("Finished script evaluation");
-            }
-            else
-            {
-                Log.LogError("Got non-zero exit code from script evaluation: " + process.ExitCode);
-            }
-
+         
             var messages = errorData.Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => x.Split(new[] { '|' }, 2))
                 .Where(x => x.Length == 2)
@@ -119,7 +111,7 @@ namespace Scripty.MsBuild
                 switch (message.MessageType)
                 {
                     case MessageType.Info:
-                        Log.LogMessage(message.Message);
+                        Log.LogMessage(MessageImportance.High, message.Message);
                         break;
                     case MessageType.Warning:
                         Log.LogWarning(message.Message);
@@ -128,6 +120,15 @@ namespace Scripty.MsBuild
                         Log.LogError(message.Message);
                         break;
                 }
+            }
+
+            if (process.ExitCode == 0)
+            {
+                Log.LogMessage("Finished script evaluation");
+            }
+            else
+            {
+                Log.LogError("Got non-zero exit code from script evaluation: " + process.ExitCode);
             }
 
             if (messages.Where(m => m.MessageType == MessageType.Error).Any())
