@@ -167,6 +167,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Consts.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Resolvers\AsmDetail.cs" />
     <Compile Include="Resolvers\CsExtraction.cs" />
     <Compile Include="Resolvers\CsRewriter.cs" />
@@ -186,7 +187,7 @@
     <Compile Include="Resolvers\RewrittenAssembly.cs" />
     <Compile Include="Resolvers\RewrittenFile.cs" />
     <Compile Include="Resolvers\ScriptDirective.cs" />
-    <Compile Include="ScriptError.cs" />
+    <Compile Include="ScriptMessage.cs" />
     <Compile Include="ScriptContext.cs" />
     <Compile Include="ScriptResult.cs" />
     <Compile Include="ScriptSource.cs" />

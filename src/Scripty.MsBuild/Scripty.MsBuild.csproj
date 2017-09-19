@@ -51,6 +51,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="BuildAction.cs" />
+    <Compile Include="MessageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptyTask.cs" />
     <Compile Include="Settings.cs" />

@@ -59,11 +59,18 @@ namespace Scripty
                 ScriptResult result = engine.Evaluate(source).Result;
 
                 // Report errors
-                if (result.Errors.Count > 0)
+                if (result.Messages.Count > 0)
                 {
-                    foreach (ScriptError error in result.Errors)
+                    foreach (ScriptMessage error in result.Messages)
                     {
-                        GeneratorError(4, error.Message, (uint) error.Line, (uint) error.Column);
+                        switch (error.MessageType) {
+                            case MessageType.Error:
+                                GeneratorError(4, error.Message, (uint)error.Line, (uint)error.Column);
+                                break;
+                            case MessageType.Warning:
+                                GeneratorWarning(4, error.Message, (uint)error.Line, (uint)error.Column);
+                                break;
+                        }
                     }
                     return null;
                 }

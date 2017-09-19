@@ -107,8 +107,9 @@ namespace Scripty.Core
                 {
                     return new ScriptResult(context.Output.OutputFiles,
                         compilationError.Diagnostics
-                            .Select(x => new ScriptError
+                            .Select(x => new ScriptMessage
                             {
+                                MessageType = MessageType.Error,
                                 Message = x.GetMessage(),
                                 Line = x.Location.GetLineSpan().StartLinePosition.Line,
                                 Column = x.Location.GetLineSpan().StartLinePosition.Character
@@ -119,8 +120,9 @@ namespace Scripty.Core
                 {
                     return new ScriptResult(context.Output.OutputFiles,
                         aggregateException.InnerExceptions
-                            .Select(x => new ScriptError
+                            .Select(x => new ScriptMessage
                             {
+                                MessageType = MessageType.Error,
                                 Message = x.ToString()
                             }).ToList());
                 }
@@ -129,13 +131,14 @@ namespace Scripty.Core
                     return new ScriptResult(context.Output.OutputFiles,
                         new[]
                         {
-                            new ScriptError
+                            new ScriptMessage
                             {
+                                MessageType = MessageType.Error,
                                 Message = ex.ToString()
                             }
                         });
                 }
-                return new ScriptResult(context.Output.OutputFiles);
+                return new ScriptResult(context.Output.OutputFiles, context.GetMessages());
             }
         }
 

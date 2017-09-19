@@ -11,6 +11,7 @@ namespace Scripty.MsBuild
     /// </summary>
     public class Settings
     {
+        public bool MessagesEnabled = false;
         public string ProjectFilePath = null;
         public string SolutionFilePath = null;
         public IList<string> ScriptFilePaths = null;
