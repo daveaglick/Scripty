@@ -15,7 +15,8 @@ namespace Scripty
         public IReadOnlyDictionary<string, string> Properties = null;
         public bool Attach = false;
         public bool MessagesEnabled = false;
-
+		    public IReadOnlyDictionary<string, string> CustomProperties = null;
+      
         private IReadOnlyList<KeyValuePair<string, string>> _properties = null;
 
         public bool ParseArgs(string[] args, out bool hasErrors)

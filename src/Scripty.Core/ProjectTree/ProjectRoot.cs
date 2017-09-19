@@ -17,11 +17,13 @@ namespace Scripty.Core.ProjectTree
         private bool _generatedTree;
 
         public ProjectRoot(string filePath)
-            : this(filePath, null, null)
+            : this(filePath, null, null, null)
         {
         }
 
-        public ProjectRoot(string projectFilePath, string solutionFilePath, IReadOnlyDictionary<string, string> properties)
+        public ProjectRoot(string projectFilePath, string solutionFilePath,
+                    IReadOnlyDictionary<string, string> properties,
+                    IReadOnlyDictionary<string, string> customProperties)
             : base(null, string.Empty, null, null)
         {
             FilePath = projectFilePath;
@@ -38,9 +40,21 @@ namespace Scripty.Core.ProjectTree
                     _properties[pair.Key] = pair.Value;
                 }
             }
+
+            CustomProperties = new Dictionary<string, string>();
+
+            if (customProperties != null)
+            {
+                foreach (var pair in customProperties)
+                {
+                    CustomProperties[pair.Key] = pair.Value;
+                }
+            }
         }
 
         public string FilePath { get; }
+
+        public Dictionary<string, string> CustomProperties { get; }
 
         public MSBuildWorkspace Workspace
         {

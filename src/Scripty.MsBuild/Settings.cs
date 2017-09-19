@@ -16,5 +16,6 @@ namespace Scripty.MsBuild
         public string SolutionFilePath = null;
         public IList<string> ScriptFilePaths = null;
         public IDictionary<string, string> Properties = null;
+        public IDictionary<string, string> CustomProperties = null;
     }
 }

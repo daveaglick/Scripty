@@ -28,6 +28,8 @@ namespace Scripty.MsBuild
 
         public string ScriptyExecutable { get; set; }
 
+        public string CustomProperties { get; set; }
+
         public ITaskItem[] ScriptFiles { get; set; }
 
         [Output]
@@ -206,9 +208,33 @@ namespace Scripty.MsBuild
                     .Where(x => !string.IsNullOrEmpty(x))
                     .Distinct()
                     .ToList(),
-                SolutionFilePath = SolutionFilePath?.Contains("*Undefined*") == true ? null : SolutionFilePath
+                SolutionFilePath = SolutionFilePath?.Contains("*Undefined*") == true ? null : SolutionFilePath,
+                CustomProperties = GetCustomProperties()
             };
             return JsonConvert.SerializeObject(settings);
+        }
+
+        private IDictionary<string, string> GetCustomProperties()
+        {
+            if (CustomProperties == null)
+                return null;
+
+            var result = new Dictionary<string, string>();
+            var parts = Utils.AsList(CustomProperties, new char[] { ';', '=' });
+
+            if (parts.Count % 2 != 0)
+            {
+                throw new Exception("Invalid CustomProperties");
+            }
+
+            for (int i = 0; i < parts.Count; i += 2)
+            {
+                var key = parts[i];
+                var value = parts[i + 1];
+
+                result[key] = value;
+            }
+            return result;
         }
 
         private IDictionary<string, string> GetMsBuildProperties()
