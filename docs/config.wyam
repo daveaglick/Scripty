@@ -1,0 +1,7 @@
+#recipe Docs
+
+Settings[Keys.Host] = "netlifysharp.netlify.com";
+Settings[DocsKeys.Title] = "NetlifySharp";
+Settings[DocsKeys.SourceFiles] = "../../src/NetlifySharp/**/*.cs";
+
+// Add any pipeline customizations here

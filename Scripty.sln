@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scripty.Core", "src\Scripty.Core\Scripty.Core.csproj", "{1C958E59-820F-4848-A0F9-4E007C10B90C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9DBAA241-C900-4B32-A7B5-FC014EC461CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F9E9E03D-3EF2-4F3E-823D-07C002D6148D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripty", "src\Scripty\Scripty.csproj", "{0ED5E07A-3B83-4155-9058-27D99F9B22E2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1C958E59-820F-4848-A0F9-4E007C10B90C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C958E59-820F-4848-A0F9-4E007C10B90C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C958E59-820F-4848-A0F9-4E007C10B90C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C958E59-820F-4848-A0F9-4E007C10B90C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0ED5E07A-3B83-4155-9058-27D99F9B22E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0ED5E07A-3B83-4155-9058-27D99F9B22E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0ED5E07A-3B83-4155-9058-27D99F9B22E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0ED5E07A-3B83-4155-9058-27D99F9B22E2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1C958E59-820F-4848-A0F9-4E007C10B90C} = {9DBAA241-C900-4B32-A7B5-FC014EC461CD}
+		{0ED5E07A-3B83-4155-9058-27D99F9B22E2} = {9DBAA241-C900-4B32-A7B5-FC014EC461CD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {38A38027-845F-4220-87ED-78A051A2840E}
+	EndGlobalSection
+EndGlobal

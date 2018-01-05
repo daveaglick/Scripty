@@ -1,54 +1,32 @@
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
-using Microsoft.CodeAnalysis.MSBuild;
-using Scripty.Core.Output;
-using Scripty.Core.ProjectTree;
-using System.Collections.Generic;
 
 namespace Scripty.Core
 {
-    public class ScriptContext : IDisposable
+    public class ScriptContext
     {
-        private List<ScriptMessage> _messages = new List<ScriptMessage>();
+        private readonly ScriptEngine _engine;
 
-        internal ScriptContext(string scriptFilePath, string projectFilePath, ProjectRoot projectRoot)
+        internal ScriptContext(ScriptEngine engine, string scriptFilePath, StreamWriter output)
         {
-            if (string.IsNullOrEmpty(scriptFilePath))
-            {
-                throw new ArgumentException("Value cannot be null or empty", nameof(scriptFilePath));
-            }
-            if (!Path.IsPathRooted(scriptFilePath))
-            {
-                throw new ArgumentException("The script file path must be absolute");
-            }
-
-            ScriptFilePath = scriptFilePath;
-            ProjectFilePath = projectFilePath;
-            Project = projectRoot;
-            Output = new OutputFileCollection(scriptFilePath);
-            Log = new Logger(_messages);
-        }
-
-        public void Dispose()
-        {
-            Output.Dispose();
+            _engine = engine;
+            Logger = engine.LoggerFactory.CreateLogger<ScriptEngine>();
+            Output = output;
         }
 
         public ScriptContext Context => this;
 
+        public ILogger Logger { get; }
+
         public string ScriptFilePath { get; }
 
-        public string ProjectFilePath { get; }
+        public string ProjectFilePath => _engine.ProjectFilePath;
 
-        public ProjectRoot Project { get; }
+        public string SolutionFilePath => _engine.SolutionFilePath;
 
-        public OutputFileCollection Output { get; }
+        public Project Project => _engine.Project;
 
-        public Logger Log { get; }
-
-        internal ICollection<ScriptMessage> GetMessages()
-        {
-            return _messages;
-        }
+        public StreamWriter Output { get; }
     }
 }
