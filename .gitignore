@@ -32,3 +32,7 @@ ipch
 **/TestCsx/*.scriptytmp
 **/TestCsx/*.rewrite.*
 **/TestCs/*.rewrite.*
+src/.vs/Scripty/v15/Server/sqlite3/db.lock
+src/.vs/Scripty/v15/Server/sqlite3/storage.ide
+src/.vs/Scripty/v15/Server/sqlite3/storage.ide-shm
+src/.vs/Scripty/v15/Server/sqlite3/storage.ide-wal

@@ -1,4 +1,4 @@
-﻿#r ".\..\..\..\packages\NUnit.3.6.1\lib\net45\nunit.framework.dll"
+﻿#r ".\..\..\..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll"
 
 //Write using supplied ScriptContext
 Output.WriteLine("namespace TestNamespace{class TestClass{public void TestMethod(){}}}");
