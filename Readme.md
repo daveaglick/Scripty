@@ -1,3 +1,9 @@
+Please note: it's been a while since a Scripty release. Rest assured, this project **is not** dead - it's just taking a little rest while other bits fall into place in supporting projects. When work here resumes the focus will be on full .NET Core compatibility.
+
+Also note that the Scripty Visual Studio extension has been removed from the Visual Studio Extension Gallery due to reports of incompatibilities with the most recent versions of Visual Studio. It will be replaced when the next release comes out, but in the meantime you can download it directly from the [GitHub version 0.7.4 release page](https://github.com/daveaglick/Scripty/releases/tag/v0.7.4).
+
+---
+
 Tools to let you use Roslyn-powered C# scripts for code generation. You can think of it as a scripted alternative to T4 templates.
 
 **Note that this document corresponds to the currently active source code branch, which may be in development. To view documentation for the latest *release* of Scripty make sure you are viewing the `master` branch.**
