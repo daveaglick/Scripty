@@ -1,3 +1,7 @@
+# 0.7.5
+
+- [Fix] Added support for dotnet build system
+
 # 0.7.4
 
 - [Fix] Fixed Cake addin target version (#95, thanks @crash-dive)
