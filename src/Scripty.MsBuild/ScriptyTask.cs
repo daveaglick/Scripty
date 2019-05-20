@@ -72,6 +72,12 @@ namespace Scripty.MsBuild
                 return false;
             }
 
+            // Some build environments by default use non-UTF8 character encodings. This
+            // fixes issues in those environments by forcing the character encoding to match
+            // the decoding in the target process.
+            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
+
             // Kick off the evaluation process, which must be done in a seperate process space
             // otherwise MSBuild complains when we construct the Roslyn workspace project since
             // it uses MSBuild to figure out what the project contains and MSBuild only supports
