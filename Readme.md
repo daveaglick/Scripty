@@ -1,4 +1,9 @@
-Please note: it's been a while since a Scripty release. Rest assured, this project **is not** dead - it's just taking a little rest while other bits fall into place in supporting projects. When work here resumes the focus will be on full .NET Core compatibility.
+Please note: it's been a while since a Scripty release. I'm not entirely sure when (or if) development on this project will resume. While I would love to pick up development here again at some point, I don't know if it makes sense to dedicate any more time given that the Roslyn team has committed to ship [source generators](https://github.com/dotnet/roslyn/projects/54) as part of .NET 5.
+
+In the meantime some other projects in this area include:
+
+- [CodeGeneration.Roslyn](https://github.com/aarnott/CodeGeneration.Roslyn)
+- [Uno.CodeGen](https://github.com/unoplatform/Uno.CodeGen)
 
 Also note that the Scripty Visual Studio extension has been removed from the Visual Studio Extension Gallery due to reports of incompatibilities with the most recent versions of Visual Studio. It will be replaced when the next release comes out, but in the meantime you can download it directly from the [GitHub version 0.7.4 release page](https://github.com/daveaglick/Scripty/releases/tag/v0.7.4).
 
