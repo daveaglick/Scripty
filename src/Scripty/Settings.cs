@@ -64,6 +64,12 @@ namespace Scripty
 
         public void ReadStdin()
         {
+            // Some build environments by default use non-UTF8 character encodings. This
+            // fixes issues in those environments by forcing the character encoding to match
+            // the decoding in the target process.
+            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
+
             string stdin = Console.In.ReadToEnd();
             JsonConvert.PopulateObject(stdin, this);
         }
